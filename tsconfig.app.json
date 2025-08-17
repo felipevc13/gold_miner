@@ -1,0 +1,23 @@
+{
+  "extends": "./nuxt.tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "types": [
+      "node",
+      "@nuxt/types",
+      "@pinia/nuxt",
+      "@nuxtjs/i18n"
+    ]
+  },
+  "include": [
+    "components/**/*",
+    "layouts/**/*",
+    "pages/**/*",
+    "plugins/**/*",
+    "app.vue"
+  ]
+}
