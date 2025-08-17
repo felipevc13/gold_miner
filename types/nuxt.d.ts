@@ -1,5 +1,7 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Config } from 'tailwindcss'
+import type { SupabaseClient, User } from '@supabase/supabase-js';
+import type { Config } from 'tailwindcss';
+import type { H3Event } from 'h3';
+import type { RouteLocationNormalized } from 'vue-router';
 
 type Tables = {
   // Define your database tables here
@@ -17,6 +19,19 @@ declare module '#app' {
   interface NuxtApp {
     $supabase: SupabaseClient<Database>
   }
+  
+  // Add global middleware types
+  function defineNuxtRouteMiddleware(
+    middleware: (to: RouteLocationNormalized, from: RouteLocationNormalized) => Promise<void> | void
+  ): void
+  
+  function navigateTo(
+    to: string,
+    options?: { replace?: boolean; redirectCode?: number }
+  ): Promise<void> | void
+  
+  function useSupabaseClient(): SupabaseClient<Database>
+  function useSupabaseUser(): any // Adjust the type according to your user type
 }
 
 declare module '@vue/runtime-core' {

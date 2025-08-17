@@ -1,12 +1,27 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { defineNuxtConfig } from "nuxt/config";
+import { defineNuxtConfig } from 'nuxt/config';
 
 export default defineNuxtConfig({
+  // TypeScript configuration
+  typescript: {
+    strict: true,
+    typeCheck: true,
+    tsConfig: {
+      compilerOptions: {
+        // Add any custom compiler options here
+      },
+      include: [
+        'types/**/*.d.ts',
+        'types/**/*.ts'
+      ]
+    }
+  },
+  
   // Core configuration
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   srcDir: ".",
-
+  
   // Build configuration
   build: {
     transpile: ["@vue-flow/core"],
@@ -26,13 +41,14 @@ export default defineNuxtConfig({
   ],
   
   // Tailwind CSS configuration
+  // @ts-ignore - Tailwind types will be available after module is loaded
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
     configPath: 'tailwind.config',
     exposeConfig: false,
     injectPosition: 0,
     viewer: true,
-  },
+  } as any,
 
 
   // Supabase module configuration
@@ -55,22 +71,7 @@ export default defineNuxtConfig({
     }
   },
 
-  // TypeScript configuration
-  typescript: {
-    strict: true,
-    typeCheck: true,
-    tsConfig: {
-      compilerOptions: {
-        types: [
-          'v-click-outside',
-          '@types/node'
-        ]
-      },
-      include: [
-        'types/**/*.d.ts'
-      ]
-    }
-  },
+  // TypeScript configuration is now at the top of the file
 
   // Components configuration
   components: ["~/components", "~/components/landing"],

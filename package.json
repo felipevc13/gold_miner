@@ -21,12 +21,15 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@nuxt/kit": "^4.0.3",
+    "@nuxt/schema": "^4.0.3",
     "@nuxt/types": "^2.18.1",
     "@nuxtjs/i18n": "^10.0.5",
     "@nuxtjs/tailwindcss": "^6.8.0",
     "@pinia/nuxt": "^0.11.2",
     "@types/node": "^24.3.0",
     "@vue/compiler-sfc": "^3.5.18",
-    "@vueuse/nuxt": "^13.6.0"
+    "@vueuse/nuxt": "^13.6.0",
+    "vue-tsc": "^3.0.5"
   }
 }

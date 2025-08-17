@@ -16,8 +16,10 @@
   "include": [
     "components/**/*",
     "layouts/**/*",
+    "middleware/**/*",
     "pages/**/*",
     "plugins/**/*",
+    "types/**/*.d.ts",
     "app.vue"
   ]
 }

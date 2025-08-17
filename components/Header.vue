@@ -1,11 +1,13 @@
 <!-- components/Header.vue -->
 <template>
-  <header class="bg-[#1d1d1f] text-white py-4 px-6 flex items-center justify-between w-full z-10 h-[72px] border-b border-[#393939]">
+  <header
+    class="text-white py-4 px-6 flex items-center justify-between w-full z-10 h-[72px]"
+  >
     <!-- Logo -->
     <div class="flex items-center">
       <h1 class="text-xl font-semibold">Gold Miner</h1>
     </div>
-    
+
     <!-- Menu Hamburger -->
     <div class="relative" ref="dropdownRef">
       <button
@@ -14,10 +16,10 @@
       >
         <Bars3Icon class="h-6 w-6 text-white" />
       </button>
-      
+
       <!-- Dropdown Menu -->
-      <div 
-        v-if="isOpen" 
+      <div
+        v-if="isOpen"
         class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[#2d2d2f] ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu"
         aria-orientation="vertical"
@@ -38,9 +40,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { Bars3Icon } from '@heroicons/vue/24/outline';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { Bars3Icon } from "@heroicons/vue/24/outline";
 
 const isOpen = ref(false);
 const dropdownRef = ref(null);
@@ -60,11 +62,11 @@ const handleLogout = async () => {
   try {
     // Aqui você pode adicionar a lógica de logout se estiver usando autenticação
     // Por exemplo: await supabase.auth.signOut();
-    
+
     // Redireciona para a página inicial
-    await router.push('/');
+    await router.push("/");
   } catch (error) {
-    console.error('Erro ao fazer logout:', error);
+    console.error("Erro ao fazer logout:", error);
   } finally {
     closeMenu();
   }
@@ -75,12 +77,12 @@ onMounted(() => {
   // Usamos setTimeout para garantir que o event listener só seja adicionado
   // após o clique que abriu o menu ser processado
   setTimeout(() => {
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
   }, 0);
 });
 
 // Remove o event listener quando o componente é desmontado
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 </script>

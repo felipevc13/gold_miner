@@ -38,15 +38,17 @@ import { VueFlow } from "@vue-flow/core";
 import { Background } from "@vue-flow/background";
 import "@vue-flow/core/dist/style.css";
 import "@vue-flow/core/dist/theme-default.css";
-import Header from "~/components/Header.vue";
+import { useRouter } from 'vue-router';
 import { useSupabaseUser } from '#imports';
-import { navigateTo } from '#imports';
+import Header from "~/components/Header.vue";
 
+// Usando composable do Nuxt para acessar o usuário e navegação
 const user = useSupabaseUser();
+const router = useRouter();
 
 // Redireciona para a página de login se o usuário não estiver autenticado
-if (!user.value) {
-  navigateTo('/login');
+if (process.client && !user.value) {
+  await router.push('/login');
 }
 
 // Se precisar de mais dados do usuário, você pode usar:
