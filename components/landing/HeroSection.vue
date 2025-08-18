@@ -1,7 +1,7 @@
 <template>
-  <section class="bg-[#171717] w-full py-16 md:py-24">
+  <section class="bg-[#17171C] w-full py-16 md:py-24">
     <div
-      class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 gap-10"
+      class="max-w-5xl font-light mx-auto flex flex-col md:flex-row items-center justify-between px-4 gap-10"
     >
       <!-- Left: Headline, Subheadline, CTA -->
       <div class="flex-1 flex flex-col md:items-start text-center md:text-left">

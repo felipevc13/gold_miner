@@ -39,15 +39,27 @@ const handleRegister = async () => {
 };
 </script>
 
+<style scoped>
+/* Autofill styles */
+:deep(input.autofill-bg:-webkit-autofill),
+:deep(input.autofill-bg:-webkit-autofill:hover),
+:deep(input.autofill-bg:-webkit-autofill:focus),
+:deep(input.autofill-bg:-webkit-autofill:active) {
+  -webkit-box-shadow: 0 0 0 30px #2c2b30 inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+</style>
+
 <template>
   <div
-    class="flex flex-col items-center justify-center min-h-screen bg-[#1d1d1f]"
+    class="flex flex-col items-center justify-center min-h-screen bg-[#17171C]"
   >
     <div
-      class="bg-[#2C2B30] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
+      class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
     >
       <div class="flex items-center justify-center mb-6">
-        <Logo class="w-12 h-12" />
+        <Logo class="w-8 h-8" />
         <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
       </div>
       <form @submit.prevent="handleRegister" class="space-y-4">
@@ -59,7 +71,8 @@ const handleRegister = async () => {
             id="email"
             v-model="email"
             type="email"
-            class="w-full px-3 py-2 border rounded"
+            autocomplete="email"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] focus:bg-[#2C2B30] autofill-bg"
             required
           />
         </div>
@@ -71,7 +84,8 @@ const handleRegister = async () => {
             id="password"
             v-model="password"
             type="password"
-            class="w-full px-3 py-2 border rounded"
+            autocomplete="new-password"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
             required
           />
         </div>
@@ -83,7 +97,8 @@ const handleRegister = async () => {
             id="confirmPassword"
             v-model="confirmPassword"
             type="password"
-            class="w-full px-3 py-2 border rounded"
+            autocomplete="new-password"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
             required
           />
         </div>
@@ -124,7 +139,7 @@ const handleRegister = async () => {
           </span>
         </button>
       </form>
-      <p class="block mt-6 text-sm text-center">
+      <p class="block mt-6 text-sm text-center text-white">
         Já tem uma conta?
         <NuxtLink to="/login" class="text-blue-600 hover:underline"
           >Entrar</NuxtLink

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#18181B] text-white">
+  <div class="min-h-screen bg-[#17171C] text-white">
     <LandingHeader />
     <main class="w-full mx-auto px-4 py-10">
       <HeroSection

@@ -1,11 +1,11 @@
 <template>
   <header
-    class="w-full bg-[#171717] px-6 py-4 flex items-center justify-between shadow-sm border-b border-[#232323]"
+    class="w-full bg-[#17171C] px-6 py-4 flex items-center justify-between shadow-sm border-b border-[#232323]"
   >
     <NuxtLink to="/" class="flex items-center gap-2">
       <!-- Substitua pelo componente/logo real caso exista -->
-      <Logo />
-      <span class="text-2xl font-light text-white">Gold Miner</span>
+      <Logo class="w-8 h-8" />
+      <span class="text-xl font-light text-white">Gold Miner</span>
     </NuxtLink>
     <NuxtLink
       to="/register"

@@ -1,13 +1,13 @@
 <template>
   <div
-    class="flex flex-col items-center justify-center min-h-screen bg-[#1d1d1f]"
+    class="flex flex-col items-center justify-center min-h-screen bg-[#17171C]"
   >
     <div
-      class="bg-[#2C2B30] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
+      class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
     >
       <div class="flex items-center justify-center mb-6">
-        <Logo />
-        <h2 class="text-xl ml-1 font-light">DoubleFlow</h2>
+        <Logo class="w-8 h-8" />
+        <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
       </div>
 
       <form @submit.prevent="handleLogin">
@@ -19,8 +19,9 @@
             v-model="email"
             id="email"
             type="email"
+            autocomplete="email"
             required
-            class="w-full px-3 py-2 border rounded"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
           />
         </div>
         <div class="mb-6">
@@ -31,8 +32,9 @@
             v-model="password"
             id="password"
             type="password"
+            autocomplete="current-password"
             required
-            class="w-full px-3 py-2 border rounded"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
           />
         </div>
         <button
@@ -59,12 +61,15 @@
         </button>
         <p v-if="error" class="mt-4 text-red-600 text-center">{{ error }}</p>
       </form>
-      <NuxtLink
-        to="/register"
-        class="block mt-6 text-sm text-blue-400 hover:underline text-center"
-      >
-        Não tem uma conta? Cadastre-se
-      </NuxtLink>
+      <p class="block mt-6 text-sm text-center text-white">
+        Não tem uma conta?
+        <NuxtLink
+          to="/register"
+          class="mt-6 text-sm text-blue-600 hover:underline text-center"
+        >
+          Cadastre-se
+        </NuxtLink>
+      </p>
     </div>
   </div>
 </template>
@@ -104,6 +109,16 @@ async function handleLogin() {
 </script>
 
 <style scoped>
+/* Autofill styles */
+:deep(input.autofill-bg:-webkit-autofill),
+:deep(input.autofill-bg:-webkit-autofill:hover), 
+:deep(input.autofill-bg:-webkit-autofill:focus), 
+:deep(input.autofill-bg:-webkit-autofill:active) {
+  -webkit-box-shadow: 0 0 0 30px #2C2B30 inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 body {
   background: #f9fafb;
 }
