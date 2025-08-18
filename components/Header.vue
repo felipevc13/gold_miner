@@ -1,7 +1,7 @@
 <!-- components/Header.vue -->
 <template>
   <header
-    class="text-white py-4 px-6 flex items-center justify-between w-full z-10 h-[72px]"
+    class="text-white py-4 px-6 flex items-center justify-between w-full z-[100] h-[72px] relative"
   >
     <!-- Menu Hamburger -->
     <div class="relative" ref="dropdownRef">
@@ -15,10 +15,11 @@
       <!-- Dropdown Menu -->
       <div
         v-if="isOpen"
-        class="origin-top-right absolute left-0 mt-2 w-auto rounded-md shadow-lg bg-[#0D0D12] ring-1 ring-black ring-opacity-5 focus:outline-none"
+        class="origin-top-right absolute left-0 mt-2 w-auto rounded-md shadow-lg bg-[#0D0D12] ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
         role="menu"
         aria-orientation="vertical"
         tabindex="-1"
+        style="z-index: 1000"
       >
         <div class="py-1" role="none">
           <button

@@ -8,11 +8,37 @@ export default defineNuxtConfig({
     typeCheck: true,
     tsConfig: {
       compilerOptions: {
-        // Add any custom compiler options here
+        // Enable Vue 3 composition API reactivity transform
+        jsx: 'preserve',
+        // Improve type checking for Vue components
+        jsxImportSource: 'vue',
+        // Enable strictest type checking
+        strict: true,
+        // Better support for Vue's reactivity system
+        skipLibCheck: true,
+        // Support for modern JavaScript features
+        target: 'ESNext',
+        module: 'ESNext',
+        moduleResolution: 'node',
+        // Support for path aliases
+        baseUrl: '.',
+        paths: {
+          '~/*': ['./*']
+        },
+        // Type checking for Vue files
+        types: [
+          '@nuxt/types',
+          '@pinia/nuxt',
+          '@vue/runtime-dom',
+          '@vue/compiler-sfc',
+          'vite/client'
+        ]
       },
       include: [
-        'types/**/*.d.ts',
-        'types/**/*.ts'
+        '**/*.ts',
+        '**/*.d.ts',
+        '**/*.tsx',
+        '**/*.vue'
       ]
     }
   },

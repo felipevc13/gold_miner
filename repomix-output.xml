@@ -42,16 +42,52 @@ The content is organized as follows:
 <directory_structure>
 app/
   app.vue
+assets/
+  css/
+    tailwind.css
+components/
+  icon/
+    Logo.vue
+  landing/
+    FeaturesSection.vue
+    HeroSection.vue
+    LandingHeader.vue
+  Header.vue
 layouts/
+  blank.vue
   default.vue
+middleware/
+  auth.global.ts
 pages/
+  app.vue
   index.vue
+  login.vue
+  register.vue
+plugins/
+  click-outside.ts
+  supabase.client.ts
 public/
   robots.txt
+types/
+  components.d.ts
+  global.d.ts
+  imports.d.ts
+  nuxt-app.d.ts
+  nuxt-config.d.ts
+  nuxt.d.ts
+  supabase.d.ts
+  supabase.ts
+  tailwind.d.ts
+  v-click-outside.d.ts
+.env.example
 .gitignore
+components.d.ts
 nuxt.config.ts
+nuxt.tsconfig.json
 package.json
 README.md
+tailwind.config.js
+tsconfig.app.json
 tsconfig.json
 </directory_structure>
 
@@ -60,57 +96,452 @@ This section contains the contents of the repository's files.
 
 <file path="app/app.vue">
 <template>
-  <div>
+  <div class="min-h-screen bg-gray-50">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
   </div>
 </template>
 
-<script setup></script>
+<style>
+@import '~/assets/css/tailwind.css';
+</style>
+</file>
+
+<file path="assets/css/tailwind.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+</file>
+
+<file path="components/icon/Logo.vue">
+<template>
+  <svg
+    width="72"
+    height="66"
+    viewBox="0 0 72 66"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M43.0052 0.219238H62.2084C62.7981 0.219377 63.3413 0.551381 63.6029 1.08252L71.2904 16.3989C71.3272 16.4719 71.3547 16.548 71.3793 16.6245C71.3887 16.6537 71.3989 16.6827 71.4066 16.7124C71.4131 16.7376 71.418 16.7631 71.4232 16.7886C71.4284 16.8138 71.4329 16.8392 71.4369 16.8647C71.4416 16.8953 71.4458 16.9258 71.4486 16.9565C71.4509 16.9806 71.4523 17.0046 71.4535 17.0288C71.4548 17.0581 71.4558 17.0874 71.4554 17.1167C71.4552 17.1492 71.4529 17.1817 71.4506 17.2144C71.4491 17.2339 71.4488 17.2535 71.4467 17.2729C71.4293 17.4312 71.3881 17.5898 71.3197 17.7427L55.1332 53.7192C55.0613 53.883 54.9623 54.0385 54.8314 54.1753L44.1166 65.3003C43.8236 65.6049 43.4173 65.7769 42.9916 65.7769H18.1791C17.847 65.7769 17.5267 65.6714 17.2611 65.4761L6.77673 57.8472C6.77225 57.8439 6.76847 57.8397 6.76404 57.8364C6.72733 57.809 6.69158 57.7808 6.65759 57.7505C6.65224 57.7457 6.64724 57.7406 6.64197 57.7358C6.61168 57.7081 6.582 57.6799 6.55408 57.6499C6.54158 57.6366 6.5299 57.6226 6.51794 57.6089C6.49671 57.5844 6.4751 57.5604 6.45544 57.5347C6.44088 57.5157 6.42803 57.4956 6.41443 57.4761C6.39968 57.4549 6.38514 57.4336 6.37146 57.4116C6.35602 57.3869 6.34147 57.3618 6.32751 57.3364C6.31743 57.318 6.30756 57.2996 6.29822 57.2808C6.28051 57.2452 6.26426 57.2091 6.24939 57.1724C6.24594 57.1638 6.24195 57.1556 6.23865 57.147C6.22505 57.1116 6.21349 57.0757 6.20251 57.0396C6.19886 57.0275 6.19416 57.0156 6.1908 57.0034L0.600952 36.7378C0.487718 36.3239 0.550384 35.8784 0.772827 35.5112L17.5463 7.90576C17.7494 7.56987 18.0736 7.32373 18.4486 7.21436L42.5101 0.293457C42.5664 0.275395 42.6242 0.261179 42.683 0.249512C42.7226 0.241357 42.7625 0.235941 42.8021 0.230957C42.8122 0.229752 42.8222 0.227085 42.8324 0.226074C42.8902 0.219968 42.9479 0.218825 43.0052 0.219238ZM11.0677 57.105L18.6869 62.6519H42.3236L50.7953 53.856L34.9652 49.1382L11.0677 57.105ZM19.8939 10.0454L3.78943 36.5542H3.79236L8.76501 54.5806L33.9291 46.1938L49.9525 20.8237L42.1244 3.65479L19.8939 10.0454ZM52.6879 22.3374L37.3676 46.5913L52.8392 51.2036L67.2064 19.2651L52.6879 22.3374ZM52.6273 19.1587L67.5912 15.9927L61.2426 3.34424H45.4183L52.6273 19.1587Z"
+      fill="white"
+    />
+  </svg>
+</template>
+
+<script>
+export default {
+  name: "Logo",
+};
+</script>
+</file>
+
+<file path="components/landing/FeaturesSection.vue">
+<template>
+  <section
+    class="w-full flex flex-col items-center py-12 px-4 md:px-12 bg-[#18181B]"
+  >
+    <div class="max-w-4xl w-full text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+        Conheça nossos recursos
+      </h2>
+      <p class="text-lg md:text-xl text-gray-300">
+        Descubra como nossas funcionalidades podem impulsionar sua experiência.
+      </p>
+    </div>
+    <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div
+        v-for="(feature, idx) in features"
+        :key="idx"
+        class="bg-[#23232A] rounded-xl p-8 flex flex-col items-center border border-[#353542] shadow-lg transition hover:scale-[1.03] hover:border-primary-500"
+      >
+        <div class="w-full flex justify-center mb-6">
+          <div
+            class="w-20 h-20 flex items-center justify-center bg-[#2d2d38] rounded-lg overflow-hidden border border-[#353542]"
+          >
+            <template v-if="feature.visual">
+              <img
+                v-if="isImage(feature.visual)"
+                :src="feature.visual"
+                alt="Visual da feature"
+                class="object-contain w-full h-full"
+                loading="lazy"
+              />
+              <video
+                v-else-if="isVideo(feature.visual)"
+                :src="feature.visual"
+                class="object-contain w-full h-full"
+                autoplay
+                muted
+                loop
+                playsinline
+              />
+              <span v-else class="text-gray-500 text-xs">Visual</span>
+            </template>
+            <template v-else>
+              <svg
+                class="w-8 h-8 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </template>
+          </div>
+        </div>
+        <h3 class="text-xl font-semibold text-white mb-2 text-center">
+          {{ feature.title }}
+        </h3>
+        <p class="text-gray-300 text-base text-center">
+          {{ feature.description }}
+        </p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+defineProps({
+  features: {
+    type: Array,
+    required: true,
+    default: () => [],
+  },
+});
+
+function isImage(src) {
+  return typeof src === "string" && /\.(jpe?g|png|gif|webp|svg)$/i.test(src);
+}
+function isVideo(src) {
+  return typeof src === "string" && /\.(mp4|webm|ogg)$/i.test(src);
+}
+</script>
+
+<style scoped>
+/* Nenhum estilo adicional necessário, todo o layout usa Tailwind */
+</style>
+</file>
+
+<file path="layouts/blank.vue">
+<!-- layouts/blank.vue -->
+<template>
+  <div>
+    <!-- O <slot /> é o local onde o conteúdo da sua página (index.vue) será renderizado -->
+    <slot />
+  </div>
+</template>
 </file>
 
 <file path="layouts/default.vue">
+<!-- layouts/default.vue -->
 <template>
   <div class="flex min-h-screen">
     <!-- Futuramente, o <SideNav /> entrará aqui -->
     <main class="flex-1">
-      <NuxtPage />
+      <!-- Mude de <NuxtPage /> para <slot /> -->
+      <slot />
     </main>
   </div>
 </template>
 </file>
 
-<file path="pages/index.vue">
-<!-- pages/index.vue -->
-<template>
-  <div
-    class="min-h-screen bg-[#171717] text-white flex flex-col items-center justify-center"
-  >
-    <h1 class="text-4xl font-bold mb-4">Bem-vindo ao Gold Miner</h1>
-    <p class="text-xl text-gray-400 mb-8">
-      Sua ferramenta para descobrir e validar ideias de negócio com IA.
-    </p>
-    <NuxtLink
-      to="/login"
-      class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
-    >
-      Começar
-    </NuxtLink>
-  </div>
-</template>
+<file path="plugins/click-outside.ts">
+// @ts-nocheck
+import type { NuxtApp } from 'nuxt/app';
+import vClickOutside from 'v-click-outside';
 
-<script setup>
-// Esta página usará o layout 'blank'
-definePageMeta({
-  layout: "blank",
+export default defineNuxtPlugin((nuxtApp: NuxtApp) => {
+  nuxtApp.vueApp.use(vClickOutside);
 });
-</script>
+</file>
+
+<file path="plugins/supabase.client.ts">
+import { defineNuxtPlugin } from "#imports";
+
+// This plugin is intentionally left empty as we're using @nuxtjs/supabase module
+// which provides the Supabase client automatically
+// This prevents duplicate Supabase client initialization
+
+export default defineNuxtPlugin(() => {
+  // The @nuxtjs/supabase module automatically provides $supabase
+  // No need to create another instance here
+});
 </file>
 
 <file path="public/robots.txt">
 User-Agent: *
 Disallow:
+</file>
+
+<file path="types/components.d.ts">
+// Type definitions for components
+declare module '#components' {
+  const LandingHeader: typeof import('../components/landing/LandingHeader.vue')['default']
+  const HeroSection: typeof import('../components/landing/HeroSection.vue')['default']
+  const FeaturesSection: typeof import('../components/landing/FeaturesSection.vue')['default']
+  
+  export {
+    LandingHeader,
+    HeroSection,
+    FeaturesSection
+  }
+}
+
+// Global component types
+declare module 'vue' {
+  interface GlobalComponents {
+    LandingHeader: typeof import('../components/landing/LandingHeader.vue')['default']
+    HeroSection: typeof import('../components/landing/HeroSection.vue')['default']
+    FeaturesSection: typeof import('../components/landing/FeaturesSection.vue')['default']
+  }
+}
+
+export {}
+</file>
+
+<file path="types/global.d.ts">
+// Global type definitions for your project
+
+// Type for the user from Supabase Auth
+type User = {
+  id: string;
+  email?: string;
+  // Add other user properties as needed
+};
+
+declare module '#app' {
+  interface NuxtApp {
+    $supabase: any; // You can replace 'any' with your Supabase client type
+  }
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $supabase: any; // You can replace 'any' with your Supabase client type
+  }
+}
+
+// This tells TypeScript about the auto-imported functions
+declare global {
+  const defineNuxtRouteMiddleware: typeof import('nuxt/app')['defineNuxtRouteMiddleware'];
+  const navigateTo: typeof import('nuxt/app')['navigateTo'];
+  const useSupabaseClient: () => any; // Replace 'any' with your Supabase client type
+  const useSupabaseUser: () => Ref<User | null>;
+}
+</file>
+
+<file path="types/imports.d.ts">
+// Type definitions for Nuxt auto-imports
+declare module '#imports' {
+  export * from '@nuxt/schema';
+  export * from 'nuxt/app';
+  export * from 'vue';
+  export * from 'vue-router';
+  export * from '#app';
+  
+  // Add Supabase client type
+  export function useSupabaseClient(): any;
+}
+
+declare module '#app' {
+  // Add navigateTo type
+  export function navigateTo(route: string): Promise<void>;
+  
+  // Add defineNuxtRouteMiddleware type
+  export function defineNuxtRouteMiddleware(middleware: (to: any, from: any) => any): any;
+  interface NuxtApp {
+    $supabase: any;
+  }
+}
+</file>
+
+<file path="types/nuxt-app.d.ts">
+// Type definitions for Nuxt 3 app
+declare module '#app' {
+  interface NuxtApp {
+    $supabase: any;
+  }
+
+  // Global middleware type
+  function defineNuxtRouteMiddleware(
+    middleware: (to: any, from: any) => Promise<void> | void
+  );
+
+  // Navigation helper
+  function navigateTo(route: string, options?: { replace?: boolean }): Promise<void>;
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $supabase: any;
+  }
+}
+
+// Type definitions for auto-imports
+declare module '#imports' {
+  export * from 'vue';
+  export * from 'vue-router';
+  export * from '@nuxt/kit';
+  export * from '@nuxt/schema';
+  
+  // Supabase
+  export function useSupabaseClient(): any;
+  export function useSupabaseUser(): any;
+  
+  // Nuxt composables
+  export function useNuxtApp(): any;
+  export function useRuntimeConfig(): any;
+  export function useRoute(): any;
+  export function useRouter(): any;
+  export function useHead(meta: any): void;
+  export function useSeoMeta(meta: any): void;
+  
+  // Other common composables
+  export function ref<T>(value: T): { value: T };
+  export function reactive<T extends object>(target: T): T;
+  export function computed<T>(getter: () => T): { readonly value: T };
+  export function watch<T>(source: () => T, callback: (newValue: T, oldValue: T) => void): () => void;
+}
+</file>
+
+<file path="types/nuxt-config.d.ts">
+// Type definitions for Nuxt config
+declare module '@nuxt/schema' {
+  interface NuxtConfig {
+    // Nuxt Supabase module configuration
+    supabase?: {
+      url?: string
+      key?: string
+      serviceKey?: string
+      redirect?: boolean
+      redirectOptions?: {
+        login: string
+        callback: string
+        exclude?: string[]
+        cookieRedirect?: boolean
+      }
+      cookieOptions?: {
+        name?: string
+        lifetime?: number
+        domain?: string
+        path?: string
+        sameSite?: 'lax' | 'strict' | 'none'
+      }
+      clientOptions?: {
+        auth?: {
+          flowType?: 'implicit' | 'pkce'
+          detectSessionInUrl?: boolean
+          persistSession?: boolean
+          autoRefreshToken?: boolean
+        }
+      }
+    }
+  }
+}
+
+export {}
+</file>
+
+<file path="types/supabase.d.ts">
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+type Tables = {
+  // Define your database tables here
+  // Example:
+  // todos: {
+  //   Row: { id: string; created_at: string; title: string; completed: boolean }
+  //   Insert: { id?: string; created_at?: string; title: string; completed?: boolean }
+  //   Update: { id?: string; created_at?: string; title?: string; completed?: boolean }
+  // }
+}
+
+type Database = Tables
+
+declare module '#app' {
+  interface NuxtApp {
+    $supabase: SupabaseClient<Database>
+  }
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $supabase: SupabaseClient<Database>
+  }
+}
+
+export {}
+</file>
+
+<file path="types/supabase.ts">
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export interface Database {
+  public: {
+    Tables: {
+      // Vamos adicionar as tabelas aqui no futuro
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
+}
+</file>
+
+<file path="types/tailwind.d.ts">
+// This file provides TypeScript support for Tailwind CSS
+declare module 'tailwindcss' {
+  // Add type definitions here if needed
+}
+
+declare module '@nuxtjs/tailwindcss' {
+  // Add type definitions here if needed
+}
+</file>
+
+<file path="types/v-click-outside.d.ts">
+declare module 'v-click-outside' {
+  import { DirectiveFunction } from 'vue';
+  
+  const vClickOutside: {
+    install: (app: any) => void;
+  };
+  
+  export default vClickOutside;
+}
+</file>
+
+<file path=".env.example">
+# Supabase Configuration
+SUPABASE_URL=your-supabase-url
+SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Other environment variables
+NODE_ENV=development
+
+# Optional: Service role key (only for server-side operations)
+# SUPABASE_SERVICE_KEY=your-supabase-service-key
 </file>
 
 <file path=".gitignore">
@@ -140,36 +571,54 @@ logs
 !.env.example
 </file>
 
-<file path="nuxt.config.ts">
-// https://nuxt.com/docs/api/configuration/nuxt-config
-export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-  build: {
-    transpile: ["@vue-flow/core"],
-  },
-});
+<file path="components.d.ts">
+// Type definitions for Vue components
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+// Component type declarations
+declare module '#app' {
+  interface NuxtApp {
+    // App-level types
+  }
+  
+  interface PageMeta {
+    layout?: string
+  }
+}
+
+// Global component types
+declare module 'vue' {
+  interface GlobalComponents {
+    LandingHeader: typeof import('./components/landing/LandingHeader.vue')['default']
+    HeroSection: typeof import('./components/landing/HeroSection.vue')['default']
+    FeaturesSection: typeof import('./components/landing/FeaturesSection.vue')['default']
+  }
+}
+
+// Type declarations for Nuxt auto-imports
+declare module '#imports' {
+  export const useSeoMeta: typeof import('@unhead/vue')['useSeoMeta']
+  export const ref: typeof import('vue')['ref']
+}
+
+declare module '#app' {
+  interface PageMeta {
+    layout?: string
+  }
+  
+  function definePageMeta(meta: PageMeta): void
+}
+
+export {}
 </file>
 
-<file path="package.json">
+<file path="nuxt.tsconfig.json">
 {
-  "name": "nuxt-app",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  },
-  "dependencies": {
-    "@vue-flow/core": "^1.46.0",
-    "nuxt": "^4.0.3",
-    "repomix": "^1.3.0",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
-  }
+  "extends": "./.nuxt/tsconfig.json"
 }
 </file>
 
@@ -251,25 +700,1019 @@ bun run preview
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 </file>
 
-<file path="tsconfig.json">
-{
-  // https://nuxt.com/docs/guide/concepts/typescript
-  "files": [],
-  "references": [
-    {
-      "path": "./.nuxt/tsconfig.app.json"
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app.vue",
+    "./app/**/*.vue",
+    "./components/**/*.{js,vue,ts}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./error.vue"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        dark: '#171717',
+      }
     },
-    {
-      "path": "./.nuxt/tsconfig.server.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.shared.json"
-    },
-    {
-      "path": "./.nuxt/tsconfig.node.json"
+  },
+  plugins: [],
+  darkMode: 'class',
+  corePlugins: {
+    preflight: true,
+  },
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  important: true
+}
+</file>
+
+<file path="components/landing/HeroSection.vue">
+<template>
+  <section class="bg-[#17171C] w-full py-16 md:py-24">
+    <div
+      class="max-w-5xl font-light mx-auto flex flex-col md:flex-row items-center justify-between px-4 gap-10"
+    >
+      <!-- Left: Headline, Subheadline, CTA -->
+      <div class="flex-1 flex flex-col md:items-start text-center md:text-left">
+        <h1 class="text-3xl md:text-5xl font-bold text-white mb-4">
+          {{ headline }}
+        </h1>
+        <p class="text-lg md:text-2xl text-white mb-8 font-medium">
+          {{ subheadline }}
+        </p>
+        <NuxtLink
+          to="/register"
+          class="w-full md:w-auto inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow transition text-center"
+        >
+          {{ ctaText || "Comece a usar de graça" }}
+        </NuxtLink>
+      </div>
+      <!-- Right: Slot for image/visual -->
+
+      <div
+        class="flex-1 flex justify-center md:justify-end w-full mt-10 md:mt-0"
+      >
+        <img src="~/assets/images/hero-img.png" alt="Hero Image" />
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+defineProps<{
+  headline: string;
+  subheadline: string;
+  ctaText?: string;
+}>();
+</script>
+</file>
+
+<file path="components/landing/LandingHeader.vue">
+<template>
+  <header
+    class="w-full bg-[#17171C] px-6 py-4 flex items-center justify-between shadow-sm border-b border-[#232323]"
+  >
+    <NuxtLink to="/" class="flex items-center gap-2">
+      <!-- Substitua pelo componente/logo real caso exista -->
+      <Logo class="w-8 h-8" />
+      <span class="text-xl font-light text-white">Gold Miner</span>
+    </NuxtLink>
+    <NuxtLink
+      to="/register"
+      class="btn btn-primary bg-blue-600 text-white rounded-lg px-5 py-2 font-semibold hover:bg-blue-700 transition"
+    >
+      Comece a usar de graça
+    </NuxtLink>
+  </header>
+</template>
+
+<script setup>
+import Logo from "~/components/icon/Logo.vue";
+// Nenhuma lógica específica necessária para este header simples
+</script>
+</file>
+
+<file path="middleware/auth.global.ts">
+// Import directly from Nuxt 3 packages
+import { navigateTo, defineNuxtRouteMiddleware } from '#app';
+import { useSupabaseClient } from '#imports';
+
+export default defineNuxtRouteMiddleware(async (to, _from) => {
+
+  // Páginas que não exigem login
+  const publicPages = ["/", "/login", "/register"];
+
+  if (publicPages.includes(to.path)) {
+    return; // Permite o acesso a páginas públicas
+  }
+
+  const supabase = useSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && !publicPages.includes(to.path)) {
+    // Se não há usuário e a página é privada, redireciona para o login
+    return navigateTo("/login");
+  } else if (
+    user &&
+    (to.path === "/login" || to.path === "/register" || to.path === "/")
+  ) {
+    // Se há usuário e ele tenta acessar o login/cadastro/landing, redireciona para o app
+    return navigateTo("/app");
+  }
+});
+</file>
+
+<file path="pages/app.vue">
+<!-- components/TaskFlow.vue -->
+<template>
+  <div class="vue-flow-wrapper h-full w-full relative flex flex-col">
+    <Header class="mb-[-72px] z-10" />
+    <div class="flex-1 relative">
+      <ClientOnly>
+        <div ref="flowContainerRef" class="vue-flow-container absolute inset-0">
+          <VueFlow
+            :default-viewport="{ zoom: 1 }"
+            :min-zoom="0.2"
+            :max-zoom="4"
+            :snap-to-grid="true"
+            :snap-grid="[15, 15]"
+            :elevate-nodes-on-select="true"
+            class="basicflow"
+          >
+            <Background
+              pattern-color="#393939"
+              color="#393939"
+              :gap="40"
+              :size="3"
+            />
+            <Controls :show-interactive="false" />
+          </VueFlow>
+        </div>
+        <template #fallback>
+          <div class="flex items-center justify-center h-full w-full">
+            <div class="loading loading-spinner loading-lg text-blue-500"></div>
+          </div>
+        </template>
+      </ClientOnly>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { VueFlow } from "@vue-flow/core";
+import { Background } from "@vue-flow/background";
+import "@vue-flow/core/dist/style.css";
+import "@vue-flow/core/dist/theme-default.css";
+import { useRouter } from 'vue-router';
+import { useSupabaseUser } from '#imports';
+import Header from "~/components/Header.vue";
+
+// Usando composable do Nuxt para acessar o usuário e navegação
+const user = useSupabaseUser();
+const router = useRouter();
+
+// Redireciona para a página de login se o usuário não estiver autenticado
+if (process.client && !user.value) {
+  await router.push('/login');
+}
+
+// Se precisar de mais dados do usuário, você pode usar:
+// const { data: userData } = await useAsyncData('user', () => $fetch('/api/auth/user'));
+</script>
+
+<style scoped>
+.vue-flow-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.vue-flow-container {
+  width: 100%;
+  height: 100%;
+}
+
+:deep(.vue-flow__node) {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: grab;
+}
+
+:deep(.vue-flow__node.dragging) {
+  cursor: grabbing;
+  z-index: 1000;
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+:deep(.vue-flow) {
+  background-color: #1d1d1f;
+}
+</style>
+
+<style scoped>
+.vue-flow-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.vue-flow-container {
+  width: 100%;
+  height: 100%;
+}
+
+:deep(.vue-flow__node) {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: grab;
+}
+
+:deep(.vue-flow__node.dragging) {
+  cursor: grabbing;
+  z-index: 1000;
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+:deep(.vue-flow) {
+  background-color: #1d1d1f;
+}
+</style>
+</file>
+
+<file path="pages/index.vue">
+<template>
+  <div class="min-h-screen bg-[#17171C] text-white">
+    <LandingHeader />
+    <main class="w-full mx-auto px-4 py-10">
+      <HeroSection
+        headline="Pare de procurar por ideias. Comece a minerar ouro."
+        subheadline="O Gold Miner é um framework visual que usa IA para descobrir nichos de mercado promissores, validar a demanda e gerar sua primeira landing page. Tudo em menos de uma hora."
+        ctaText="Encontre sua ideia de ouro de graça"
+      />
+      <FeaturesSection :features="productFeatures" />
+    </main>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Define features data with TypeScript type
+interface Feature {
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+const productFeatures: Feature[] = [
+  {
+    title: "Análise de Mercado",
+    description:
+      "Identifique oportunidades de mercado com base em dados reais de busca e concorrência.",
+    icon: "📊",
+  },
+  {
+    title: "Validação de Ideias",
+    description:
+      "Teste a viabilidade do seu negócio antes de investir tempo e dinheiro.",
+    icon: "✅",
+  },
+  {
+    title: "Geração de Conteúdo",
+    description:
+      "Crie conteúdo otimizado para seu público-alvo com a ajuda de IA.",
+    icon: "✍️",
+  },
+];
+
+// Page metadata
+definePageMeta({
+  layout: "default",
+});
+</script>
+</file>
+
+<file path="pages/login.vue">
+<template>
+  <div
+    class="flex flex-col items-center justify-center min-h-screen bg-[#17171C]"
+  >
+    <div
+      class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
+    >
+      <div class="flex items-center justify-center mb-6">
+        <Logo class="w-8 h-8" />
+        <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
+      </div>
+
+      <form @submit.prevent="handleLogin">
+        <div class="mb-4">
+          <label class="block text-white mb-2 font-light" for="email"
+            >E-mail</label
+          >
+          <input
+            v-model="email"
+            id="email"
+            type="email"
+            autocomplete="email"
+            required
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
+          />
+        </div>
+        <div class="mb-6">
+          <label class="block text-white mb-2 font-light" for="password"
+            >Senha</label
+          >
+          <input
+            v-model="password"
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          :disabled="isLoading"
+        >
+          <span v-if="!isLoading">Entrar</span>
+          <span v-else class="flex items-center justify-center">
+            <svg
+              class="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 18V4a8 8 0 010 16z"
+              />
+            </svg>
+            <span class="ml-2">Entrando...</span>
+          </span>
+        </button>
+        <p v-if="error" class="mt-4 text-red-600 text-center">{{ error }}</p>
+      </form>
+      <p class="block mt-6 text-sm text-center text-white">
+        Não tem uma conta?
+        <NuxtLink
+          to="/register"
+          class="mt-6 text-sm text-blue-600 hover:underline text-center"
+        >
+          Cadastre-se
+        </NuxtLink>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+definePageMeta({ layout: "blank" });
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const isLoading = ref(false);
+const router = useRouter();
+const supabase = useSupabaseClient();
+import Logo from "~/components/icon/Logo.vue";
+import { NuxtLink } from "#components";
+
+async function handleLogin() {
+  isLoading.value = true;
+  error.value = "";
+  const { error: loginError } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  });
+
+  if (loginError) {
+    error.value = "E-mail ou senha inválidos.";
+    isLoading.value = false;
+    return;
+  } else {
+    // Aguarda tarefas carregarem, passando o client
+    await router.replace("/app");
+
+    isLoading.value = false;
+  }
+}
+</script>
+
+<style scoped>
+/* Autofill styles */
+:deep(input.autofill-bg:-webkit-autofill),
+:deep(input.autofill-bg:-webkit-autofill:hover), 
+:deep(input.autofill-bg:-webkit-autofill:focus), 
+:deep(input.autofill-bg:-webkit-autofill:active) {
+  -webkit-box-shadow: 0 0 0 30px #2C2B30 inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+body {
+  background: #f9fafb;
+}
+</style>
+</file>
+
+<file path="pages/register.vue">
+<script setup>
+definePageMeta({ layout: "blank" });
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import Logo from "~/components/icon/Logo.vue";
+
+const supabase = useSupabaseClient();
+const router = useRouter();
+
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+const errorMessage = ref("");
+const successMessage = ref("");
+const loading = ref(false);
+
+const handleRegister = async () => {
+  errorMessage.value = "";
+  successMessage.value = "";
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = "As senhas não coincidem.";
+    return;
+  }
+  loading.value = true;
+  const { error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+  });
+  loading.value = false;
+  if (error) {
+    errorMessage.value = error.message;
+  } else {
+    successMessage.value =
+      "Cadastro realizado com sucesso! Verifique seu email.";
+    setTimeout(() => {
+      router.push("/login");
+    }, 2000);
+  }
+};
+</script>
+
+<style scoped>
+/* Autofill styles */
+:deep(input.autofill-bg:-webkit-autofill),
+:deep(input.autofill-bg:-webkit-autofill:hover),
+:deep(input.autofill-bg:-webkit-autofill:focus),
+:deep(input.autofill-bg:-webkit-autofill:active) {
+  -webkit-box-shadow: 0 0 0 30px #2c2b30 inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+</style>
+
+<template>
+  <div
+    class="flex flex-col items-center justify-center min-h-screen bg-[#17171C]"
+  >
+    <div
+      class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
+    >
+      <div class="flex items-center justify-center mb-6">
+        <Logo class="w-8 h-8" />
+        <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
+      </div>
+      <form @submit.prevent="handleRegister" class="space-y-4">
+        <div>
+          <label class="block text-white mb-2 font-light" for="email"
+            >Email</label
+          >
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            autocomplete="email"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] focus:bg-[#2C2B30] autofill-bg"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-white mb-2 font-light" for="password"
+            >Senha</label
+          >
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            autocomplete="new-password"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-white mb-2 font-light" for="confirmPassword"
+            >Confirmar senha</label
+          >
+          <input
+            id="confirmPassword"
+            v-model="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
+            required
+          />
+        </div>
+        <div v-if="errorMessage" class="mt-4 text-red-600 text-center">
+          {{ errorMessage }}
+        </div>
+        <div v-if="successMessage" class="mt-4 text-green-500 text-center">
+          {{ successMessage }}
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition flex items-center justify-center"
+          :disabled="loading"
+        >
+          <svg
+            v-if="loading"
+            class="animate-spin h-5 w-5 mr-2 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          <span>
+            {{ loading ? "Cadastrando..." : "Cadastrar" }}
+          </span>
+        </button>
+      </form>
+      <p class="block mt-6 text-sm text-center text-white">
+        Já tem uma conta?
+        <NuxtLink to="/login" class="text-blue-600 hover:underline"
+          >Entrar</NuxtLink
+        >
+      </p>
+    </div>
+  </div>
+</template>
+</file>
+
+<file path="types/nuxt.d.ts">
+import type { SupabaseClient, User } from '@supabase/supabase-js';
+import type { Config } from 'tailwindcss';
+import type { H3Event } from 'h3';
+import type { RouteLocationNormalized } from 'vue-router';
+
+type Tables = {
+  // Define your database tables here
+  // Example:
+  // todos: {
+  //   Row: { id: string; created_at: string; title: string; completed: boolean }
+  //   Insert: { id?: string; created_at?: string; title: string; completed?: boolean }
+  //   Update: { id?: string; created_at?: string; title?: string; completed?: boolean }
+  // }
+}
+
+type Database = Tables
+
+declare module '#app' {
+  interface NuxtApp {
+    $supabase: SupabaseClient<Database>
+  }
+  
+  // Add global middleware types
+  function defineNuxtRouteMiddleware(
+    middleware: (to: RouteLocationNormalized, from: RouteLocationNormalized) => Promise<void> | void
+  ): void
+  
+  function navigateTo(
+    to: string,
+    options?: { replace?: boolean; redirectCode?: number }
+  ): Promise<void> | void
+  
+  function useSupabaseClient(): SupabaseClient<Database>
+  function useSupabaseUser(): any // Adjust the type according to your user type
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $supabase: SupabaseClient<Database>
+  }
+}
+
+// Extend Nuxt configuration with Tailwind CSS module
+declare module 'nuxt/schema' {
+  interface NuxtConfig {
+    tailwindcss?: {
+      config?: Partial<Config>
+      cssPath?: string
+      configPath?: string
+      exposeConfig?: boolean
+      injectPosition?: number
+      viewer?: boolean
     }
+  }
+}
+
+// This is needed for the $tailwind property
+declare module '@nuxt/schema' {
+  interface NuxtConfig {
+    tailwindcss?: {
+      config?: Partial<Config>
+      cssPath?: string
+      configPath?: string
+      exposeConfig?: boolean
+      injectPosition?: number
+      viewer?: boolean
+    }
+  }
+}
+
+// Type definitions for Nuxt auto-imports
+declare global {
+  // Nuxt auto-imports
+  const definePageMeta: typeof import('nuxt/app')['definePageMeta']
+  const useHead: typeof import('@unhead/vue')['useHead']
+  const useSeoMeta: typeof import('@unhead/vue')['useSeoMeta']
+  const useNuxtApp: typeof import('nuxt/app')['useNuxtApp']
+  const ref: typeof import('vue')['ref']
+  const computed: typeof import('vue')['computed']
+  const onMounted: typeof import('vue')['onMounted']
+  const onUnmounted: typeof import('vue')['onUnmounted']
+  const watch: typeof import('vue')['watch']
+  const useRouter: typeof import('vue-router')['useRouter']
+  const useRoute: typeof import('vue-router')['useRoute']
+  
+  // Supabase
+  const useSupabaseClient: () => SupabaseClient<Database>
+  const useSupabaseUser: () => any // You can type this more specifically if needed
+}
+
+export {}
+</file>
+
+<file path="nuxt.config.ts">
+// https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from 'nuxt/config';
+
+export default defineNuxtConfig({
+  // TypeScript configuration
+  typescript: {
+    strict: true,
+    typeCheck: true,
+    tsConfig: {
+      compilerOptions: {
+        // Add any custom compiler options here
+      },
+      include: [
+        'types/**/*.d.ts',
+        'types/**/*.ts'
+      ]
+    }
+  },
+  
+  // Core configuration
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
+  srcDir: ".",
+  
+  // Build configuration
+  build: {
+    transpile: ["@vue-flow/core"],
+  },
+  
+  // Global CSS
+  css: [
+    '~/assets/css/tailwind.css'
+  ],
+
+  // Modules
+  modules: [
+    "@nuxtjs/supabase", 
+    "@vueuse/nuxt", 
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss"
+  ],
+  
+  // Tailwind CSS configuration
+  // @ts-ignore - Tailwind types will be available after module is loaded
+  tailwindcss: {
+    cssPath: '~/assets/css/tailwind.css',
+    configPath: 'tailwind.config',
+    exposeConfig: false,
+    injectPosition: 0,
+    viewer: true,
+  } as any,
+
+
+  // Supabase module configuration
+  // @ts-ignore - Supabase types are not properly recognized
+  supabase: {
+    // Use environment variables directly
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_ANON_KEY,
+    
+    // Disable built-in redirects
+    redirect: false,
+    
+    // Client options
+    clientOptions: {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  },
+
+  // TypeScript configuration is now at the top of the file
+
+  // Components configuration
+  components: ["~/components", "~/components/landing"],
+
+  // Auto-imports
+  imports: {
+    autoImport: true,
+  },
+
+  // Vite configuration
+  vite: {
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: true,
+      },
+    },
+    plugins: [
+      {
+        name: "disable-vue-tsc",
+        config: () => ({
+          build: {
+            rollupOptions: {
+              external: ["vite-plugin-checker"],
+            },
+          },
+        }),
+      },
+    ],
+  },
+
+  // Runtime config
+  runtimeConfig: {
+    public: {
+      // Will be available on both server and client
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      supabaseUrl: process.env.SUPABASE_URL || '',
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
+    }
+  },
+});
+</file>
+
+<file path="package.json">
+{
+  "name": "nuxt-app",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@heroicons/vue": "^2.2.0",
+    "@nuxtjs/supabase": "^1.6.0",
+    "@vue-flow/background": "^1.3.2",
+    "@vue-flow/core": "^1.46.0",
+    "nuxt": "^3.0.0",
+    "repomix": "^1.3.0",
+    "v-click-outside": "^3.2.0",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "^4.0.3",
+    "@nuxt/schema": "^4.0.3",
+    "@nuxt/types": "^2.18.1",
+    "@nuxtjs/i18n": "^10.0.5",
+    "@nuxtjs/tailwindcss": "^6.8.0",
+    "@pinia/nuxt": "^0.11.2",
+    "@types/node": "^24.3.0",
+    "@vue/compiler-sfc": "^3.5.18",
+    "@vueuse/nuxt": "^13.6.0",
+    "vue-tsc": "^3.0.5"
+  }
+}
+</file>
+
+<file path="tsconfig.app.json">
+{
+  "extends": "./nuxt.tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "types": [
+      "node",
+      "@nuxt/types",
+      "@pinia/nuxt",
+      "@nuxtjs/i18n"
+    ]
+  },
+  "include": [
+    "components/**/*",
+    "layouts/**/*",
+    "middleware/**/*",
+    "pages/**/*",
+    "plugins/**/*",
+    "types/**/*.d.ts",
+    "app.vue"
   ]
 }
+</file>
+
+<file path="tsconfig.json">
+// Base TypeScript configuration for Nuxt 3
+{
+  // Extend from the Nuxt recommended tsconfig
+  "extends": "./.nuxt/tsconfig.json",
+  
+  // Compiler options
+  "compilerOptions": {
+    // Type checking
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    
+    // Module resolution
+    "baseUrl": ".",
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "ESNext",
+    "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    
+    // Path aliases
+    "paths": {
+      "~/*": ["./*"],
+      "@/*": ["./*"],
+      "#imports": ["./.nuxt/imports.d.ts"],
+      "#components": ["./components"]
+    }
+  },
+  
+  // Include these files for type checking
+  "include": [
+    ".nuxt/nuxt.d.ts",
+    "components/**/*",
+    "composables/**/*",
+    "layouts/**/*",
+    "middleware/**/*",
+    "pages/**/*",
+    "plugins/**/*",
+    "app.vue",
+    "error.vue",
+    "types/**/*.d.ts",
+    "types/**/*.ts"
+  ],
+  
+  // Exclude these files from type checking
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    ".output",
+    "dist"
+  ]
+}
+</file>
+
+<file path="components/Header.vue">
+<!-- components/Header.vue -->
+<template>
+  <header
+    class="text-white py-4 px-6 flex items-center justify-between w-full z-10 h-[72px]"
+  >
+    <!-- Menu Hamburger -->
+    <div class="relative" ref="dropdownRef">
+      <button
+        @click.stop="isOpen = !isOpen"
+        class="p-2 rounded-md bg-[#2d2d2f] hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+      >
+        <Bars3Icon class="h-6 w-6 text-white" />
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div
+        v-if="isOpen"
+        class="origin-top-right absolute left-0 mt-2 w-auto rounded-md shadow-lg bg-[#0D0D12] ring-1 ring-black ring-opacity-5 focus:outline-none"
+        role="menu"
+        aria-orientation="vertical"
+        tabindex="-1"
+      >
+        <div class="py-1" role="none">
+          <button
+            @click="handleLogout"
+            class="text-gray-200 hover:bg-[#2d2d2f] block w-full text-left px-4 py-2 text-sm"
+            role="menuitem"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { Bars3Icon } from "@heroicons/vue/24/outline";
+
+const isOpen = ref(false);
+const dropdownRef = ref(null);
+const router = useRouter();
+
+const closeMenu = () => {
+  isOpen.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    closeMenu();
+  }
+};
+
+const handleLogout = async () => {
+  try {
+    // Aqui você pode adicionar a lógica de logout se estiver usando autenticação
+    // Por exemplo: await supabase.auth.signOut();
+
+    // Redireciona para a página inicial
+    await router.push("/");
+  } catch (error) {
+    console.error("Erro ao fazer logout:", error);
+  } finally {
+    closeMenu();
+  }
+};
+
+// Configura o event listener para clique fora após a montagem do componente
+onMounted(() => {
+  // Usamos setTimeout para garantir que o event listener só seja adicionado
+  // após o clique que abriu o menu ser processado
+  setTimeout(() => {
+    document.addEventListener("click", handleClickOutside);
+  }, 0);
+});
+
+// Remove o event listener quando o componente é desmontado
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+</script>
 </file>
 
 </files>

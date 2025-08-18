@@ -10,7 +10,11 @@
       "node",
       "@nuxt/types",
       "@pinia/nuxt",
-      "@nuxtjs/i18n"
+      "@nuxtjs/i18n",
+      "@vue/runtime-dom",
+      "@vue/compiler-sfc",
+      "./types/vue-flow-controls",
+      "vite/client"
     ]
   },
   "include": [
