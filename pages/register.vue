@@ -3,6 +3,7 @@ definePageMeta({ layout: "blank" });
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Logo from "~/components/icon/Logo.vue";
+import Button from '~/components/ui/Button.vue';
 
 const supabase = useSupabaseClient();
 const router = useRouter();
@@ -108,36 +109,13 @@ const handleRegister = async () => {
         <div v-if="successMessage" class="mt-4 text-green-500 text-center">
           {{ successMessage }}
         </div>
-        <button
+        <Button
           type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition flex items-center justify-center"
           :disabled="loading"
+          class="w-full"
         >
-          <svg
-            v-if="loading"
-            class="animate-spin h-5 w-5 mr-2 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            ></path>
-          </svg>
-          <span>
-            {{ loading ? "Cadastrando..." : "Cadastrar" }}
-          </span>
-        </button>
+          {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+        </Button>
       </form>
       <p class="block mt-6 text-sm text-center text-white">
         Já tem uma conta?
