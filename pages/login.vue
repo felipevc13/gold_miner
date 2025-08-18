@@ -37,28 +37,26 @@
             class="w-full px-3 py-2 border border-[#47464B] rounded text-white bg-[#2C2B30] autofill-bg"
           />
         </div>
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          :disabled="isLoading"
-        >
-          <span v-if="!isLoading">Entrar</span>
-          <span v-else class="flex items-center justify-center">
-            <svg
-              class="animate-spin h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 18V4a8 8 0 010 16z"
-              />
-            </svg>
-            <span class="ml-2">Entrando...</span>
-          </span>
-        </button>
+        <div class="mt-4">
+          <Button type="submit" :disabled="isLoading" class="w-full">
+            <template v-if="!isLoading">Entrar</template>
+            <template v-else>
+              <svg
+                class="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 18V4a8 8 0 010 16z"
+                />
+              </svg>
+              <span class="ml-2">Entrando...</span>
+            </template>
+          </Button>
+        </div>
         <p v-if="error" class="mt-4 text-red-600 text-center">{{ error }}</p>
       </form>
       <p class="block mt-6 text-sm text-center text-white">
@@ -74,18 +72,23 @@
   </div>
 </template>
 
-<script setup>
-definePageMeta({ layout: "blank" });
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+<script setup lang="ts">
+// Components
+import Button from "~/components/ui/Button.vue";
+import Logo from "~/components/icon/Logo.vue";
+
+// State
 const email = ref("");
 const password = ref("");
 const error = ref("");
 const isLoading = ref(false);
+
+// Composable
 const router = useRouter();
 const supabase = useSupabaseClient();
-import Logo from "~/components/icon/Logo.vue";
-import { NuxtLink } from "#components";
+
+// Nuxt 3 auto-imports these:
+// - ref, useRouter, useSupabaseClient, NuxtLink
 
 async function handleLogin() {
   isLoading.value = true;
@@ -111,10 +114,10 @@ async function handleLogin() {
 <style scoped>
 /* Autofill styles */
 :deep(input.autofill-bg:-webkit-autofill),
-:deep(input.autofill-bg:-webkit-autofill:hover), 
-:deep(input.autofill-bg:-webkit-autofill:focus), 
+:deep(input.autofill-bg:-webkit-autofill:hover),
+:deep(input.autofill-bg:-webkit-autofill:focus),
 :deep(input.autofill-bg:-webkit-autofill:active) {
-  -webkit-box-shadow: 0 0 0 30px #2C2B30 inset !important;
+  -webkit-box-shadow: 0 0 0 30px #2c2b30 inset !important;
   -webkit-text-fill-color: white !important;
   transition: background-color 5000s ease-in-out 0s;
 }
