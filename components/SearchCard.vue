@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-start p-3 gap-2.5 w-[300px] bg-[#17171C] shadow-md rounded-lg">
+  <div class="flex flex-col items-start p-3 gap-2.5 w-full bg-[#17171C] shadow-md rounded-lg">
     <!-- Header -->
     <div class="w-full flex flex-row items-center">
       <h3 class="text-[#DAD7DE] text-sm font-semibold leading-5">
@@ -13,12 +13,13 @@
         <input
           type="text"
           :placeholder="placeholder"
-          v-model="searchQuery"
+          :value="modelValue"
           @input="handleInput"
+          @keyup.enter="$emit('search', searchQuery)"
           class="w-full h-9 px-2.5 py-1.5 bg-[#292932] rounded text-[#DAD7DE] text-sm placeholder:text-[rgba(218,215,222,0.3)] focus:outline-none focus:ring-1 focus:ring-[#8E6CE4]"
         />
         <button
-          v-if="searchQuery"
+          v-if="modelValue"
           @click="clearSearch"
           class="absolute right-2 text-[#DAD7DE] hover:text-white"
         >
@@ -27,6 +28,11 @@
           </svg>
         </button>
       </div>
+    </div>
+    
+    <!-- Results Slot -->
+    <div v-if="$slots.results" class="w-full">
+      <slot name="results"></slot>
     </div>
   </div>
 </template>

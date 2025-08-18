@@ -2,30 +2,30 @@
   <div class="vue-flow-wrapper h-full w-full relative flex flex-col">
     <Header class="mb-[-72px] z-11" />
 
-    <!-- Search Bar -->
-    <div class="absolute top-20 left-4 z-10 flex items-center gap-4">
-      <div class="relative">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Busque por um mercado ou nicho"
-          class="w-80 bg-[#2C2B30] border border-[#47464B] text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          @keyup.enter="handleSearch"
-        />
-        <div
-          v-if="searchResults.length > 0"
-          class="absolute mt-1 w-full bg-[#2C2B30] border border-[#47464B] rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto"
-        >
+    <!-- Search Card -->
+    <div class="absolute top-16 left-4 z-10">
+      <SearchCard
+        v-model="searchQuery"
+        placeholder="ex: 'saúde para idosos', 'produtividade'"
+        @search="handleSearch"
+        class="w-[300px]"
+      >
+        <template #results>
           <div
-            v-for="result in searchResults"
-            :key="result.id"
-            class="px-4 py-2 hover:bg-[#3a393e] cursor-pointer"
-            @click="selectSearchResult(result)"
+            v-if="searchResults.length > 0"
+            class="mt-2 w-full bg-[#2C2B30] border border-[#47464B] rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto"
           >
-            {{ result.label }}
+            <div
+              v-for="result in searchResults"
+              :key="result.id"
+              class="px-4 py-2 hover:bg-[#3a393e] cursor-pointer text-white text-sm"
+              @click="selectSearchResult(result)"
+            >
+              {{ result.label }}
+            </div>
           </div>
-        </div>
-      </div>
+        </template>
+      </SearchCard>
     </div>
 
     <!-- Main Canvas Area -->
@@ -83,6 +83,7 @@ import { useSupabaseUser } from "#imports";
 import Header from "~/components/Header.vue";
 import { useMindMapStore } from "~/stores/mindMapStore";
 import MindMapNode from "~/components/canvas/MindMapNode.vue";
+import SearchCard from "~/components/SearchCard.vue";
 
 // Define node types for Vue Flow
 const nodeTypes = {
