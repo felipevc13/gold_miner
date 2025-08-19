@@ -108,6 +108,45 @@ tsconfig.json
 <files>
 This section contains the contents of the repository's files.
 
+<file path="app/app.vue">
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
+</template>
+
+<style>
+@import '~/assets/css/tailwind.css';
+</style>
+</file>
+
+<file path="assets/css/tailwind.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+</file>
+
+<file path="components/icon/CloseIcon.vue">
+<template>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    class="w-6 h-6"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+</template>
+</file>
+
 <file path="components/icon/HeartIcon.vue">
 <template>
   <svg
@@ -130,365 +169,6 @@ This section contains the contents of the repository's files.
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-    />
-  </svg>
-</template>
-</file>
-
-<file path="composables/useMindMapLayout.ts">
-import type { Node, Edge, XYPosition } from "@vue-flow/core";
-
-type LayoutOpts = {
-  rootId: string;
-  levelGap?: number; // distância horizontal entre níveis
-  rowGap?: number; // distância vertical entre irmãos
-  center?: XYPosition; // onde posicionar o root
-};
-
-export function layoutMindMap(
-  nodes: Node[],
-  edges: Edge[],
-  opts: LayoutOpts
-): Node[] {
-  const levelGap = opts.levelGap ?? 280;
-  const rowGap = opts.rowGap ?? 100;
-  const center = opts.center ?? { x: 200, y: 200 };
-
-  // Índices rápidos
-  const children = new Map<string, string[]>();
-  edges.forEach((e) => {
-    const list = children.get(e.source) ?? [];
-    list.push(e.target);
-    children.set(e.source, list);
-  });
-
-  // BFS por níveis
-  const levels: string[][] = [];
-  const q = [[opts.rootId, 0] as [string, number]];
-  const seen = new Set<string>();
-  while (q.length) {
-    const [id, lvl] = q.shift()!;
-    if (seen.has(id)) continue;
-    seen.add(id);
-    if (!levels[lvl]) levels[lvl] = [];
-    levels[lvl].push(id);
-    for (const c of children.get(id) ?? []) q.push([c, lvl + 1]);
-  }
-
-  // Posicionar root
-  const positioned = new Map<string, XYPosition>();
-  positioned.set(opts.rootId, { x: center.x, y: center.y });
-
-  // Para cada nível, empilhe filhos em coluna vertical
-  for (let lvl = 1; lvl < levels.length; lvl++) {
-    const ids = levels[lvl];
-    // Agrupar por pai p/ manter irmãos juntos
-    const groups = new Map<string, string[]>();
-    ids.forEach((id) => {
-      const edge = edges.find((e) => e.target === id);
-      if (!edge) return;
-      const arr = groups.get(edge.source) ?? [];
-      arr.push(id);
-      groups.set(edge.source, arr);
-    });
-
-    for (const [parentId, group] of groups) {
-      const parentPos = positioned.get(parentId) ?? center;
-      const x = parentPos.x + levelGap;
-
-      // Distribui irmãos ao redor da linha do pai
-      const totalHeight = (group.length - 1) * rowGap;
-      const startY = parentPos.y - totalHeight / 2;
-      group.forEach((id, idx) => {
-        positioned.set(id, { x, y: startY + idx * rowGap });
-      });
-    }
-  }
-
-  // Retorna nós com nova position (sem mexer no resto do data)
-  return nodes.map((n) => {
-    const p = positioned.get(n.id);
-    return p ? { ...n, position: p, draggable: true } : n;
-  });
-}
-</file>
-
-<file path="app/app.vue">
-<template>
-  <div class="min-h-screen bg-gray-50">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
-
-<style>
-@import '~/assets/css/tailwind.css';
-</style>
-</file>
-
-<file path="assets/css/tailwind.css">
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-</file>
-
-<file path="components/canvas/MindMapNode.vue">
-<template>
-  <div
-    class="group relative w-64 select-none"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
-    tabindex="0"
-  >
-    <Handle
-      type="source"
-      :position="Position.Right"
-      :style="{ opacity: 0, pointerEvents: 'none' }"
-    />
-    <Handle
-      type="target"
-      :position="Position.Left"
-      :style="{ opacity: 0, pointerEvents: 'none' }"
-    />
-    <!-- ROOT: sempre card -->
-    <div
-      v-if="data.isRoot"
-      class="p-4 rounded-lg bg-[#1d1d1f] border border-gray-800 shadow-lg transition-all duration-200 flex items-start gap-3 border-l-4 border-l-amber-500"
-      :class="{
-        'border-blue-500 border-2': selected,
-        'hover:border-blue-400': !selected,
-      }"
-    >
-      <!-- Input connection point (left) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-      />
-
-      <!-- Node content -->
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center mb-1">
-          <div class="mr-2 flex items-center" v-if="data.iconName">
-            <component
-              :is="getIconComponent(data.iconName)"
-              v-if="getIconComponent(data.iconName)"
-            />
-          </div>
-          <div class="font-semibold text-sm flex-grow">
-            {{ data.label || label }}
-          </div>
-          <button
-            v-if="hasChildren"
-            @click.stop="toggle"
-            class="w-5 h-5 rounded-full bg-white/10 border-0 text-white flex items-center justify-center cursor-pointer text-sm leading-none transition-all ml-2 hover:bg-white/20"
-            :class="{ 'is-expanded': isExpanded }"
-          >
-            {{ isExpanded ? "−" : "+" }}
-          </button>
-        </div>
-        <div class="text-xs opacity-90 mt-1" v-if="data.description">
-          {{ data.description }}
-        </div>
-      </div>
-
-      <!-- Output connection point (right) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-      />
-    </div>
-
-    <!-- NÃO-ROOT: lightweight por padrão, card no hover/focus -->
-    <div v-else class="w-64">
-      <!-- Lightweight (texto simples) -->
-      <span
-        class="block text-sm text-neutral-300/90 leading-snug truncate group-hover:hidden group-focus-visible:hidden"
-      >
-        {{ data.label || label }}
-      </span>
-
-      <!-- Card no hover/focus -->
-      <div
-        class="hidden group-hover:flex group-focus-visible:flex p-3 rounded-lg bg-[#1d1d1f] border border-gray-800 shadow-lg transition-all duration-200 items-start gap-2"
-        :class="{
-          'border-blue-500 border-2': selected,
-          'hover:border-blue-400': !selected,
-        }"
-      >
-        <!-- Input connection point (left) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-        />
-
-        <!-- Node content -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center mb-1">
-            <div class="mr-2 flex items-center" v-if="data.iconName">
-              <component
-                :is="getIconComponent(data.iconName)"
-                v-if="getIconComponent(data.iconName)"
-              />
-            </div>
-            <div class="font-semibold text-sm flex-grow">
-              {{ data.label || label }}
-            </div>
-            <button
-              v-if="hasChildren"
-              @click.stop="toggle"
-              class="w-5 h-5 rounded-full bg-white/10 border-0 text-white flex items-center justify-center cursor-pointer text-sm leading-none transition-all ml-2 hover:bg-white/20"
-              :class="{ 'is-expanded': isExpanded }"
-            >
-              {{ isExpanded ? "−" : "+" }}
-            </button>
-          </div>
-          <div class="text-xs opacity-90 mt-1" v-if="data.description">
-            {{ data.description }}
-          </div>
-          <div class="mt-2 flex gap-2">
-            <button
-              v-if="data.onPrimary"
-              class="rounded-md bg-white/10 px-2 py-1 text-xs hover:bg-white/20 text-white"
-              @click.stop="data.onPrimary?.()"
-            >
-              Pesquisar categoria
-            </button>
-          </div>
-        </div>
-
-        <!-- Output connection point (right) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-// Auto-imported in Nuxt 3: ref, computed, nextTick, defineAsyncComponent
-
-// Use Vue Flow and store
-const { useVueFlow } = await import("@vue-flow/core");
-const { useMindMapStore } = await import("~/stores/mindMapStore");
-const { Handle, Position } = await import("@vue-flow/core");
-
-const isHovered = ref(false);
-const store = useMindMapStore();
-const { updateNodeInternals } = useVueFlow();
-
-// Simple icon component resolution
-const getIconComponent = (iconName) => {
-  if (!iconName) return null;
-
-  if (iconName === "heart") {
-    return defineAsyncComponent({
-      loader: () => import("~/components/icon/HeartIcon.vue"),
-      loadingComponent: { template: "<div></div>" },
-      delay: 200,
-      timeout: 3000,
-    });
-  }
-  return null;
-};
-
-// Component props
-const props = defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  data: {
-    type: Object,
-    required: true,
-    default: () => ({
-      isRoot: false,
-      isExpanded: false,
-      children: [],
-    }),
-  },
-  label: {
-    type: String,
-    default: "",
-  },
-  type: {
-    type: String,
-    default: "default",
-  },
-  selected: {
-    type: Boolean,
-    default: false,
-  },
-  isConnectable: {
-    type: Boolean,
-    default: true,
-  },
-  position: {
-    type: Object,
-    required: true,
-    default: () => ({ x: 0, y: 0 }),
-  },
-  // Vue Flow connection points
-  sourcePosition: {
-    type: String,
-    default: "right",
-  },
-  targetPosition: {
-    type: String,
-    default: "left",
-  },
-});
-
-// Computed properties
-const hasChildren = computed(() => {
-  return props.data?.children?.length > 0;
-});
-
-const isExpanded = computed(() => {
-  return !!props.data?.isExpanded;
-});
-
-const isRoot = computed(() => !!props.data?.isRoot);
-
-// Toggle node expansion
-const toggle = () => {
-  store.toggleNode(props.id);
-  // Force Vue Flow to recalculate after state change
-  nextTick(() => {
-    updateNodeInternals();
-  });
-};
-
-// Expose connection points for Vue Flow
-const connectionPoints = {
-  source: "right",
-  target: "left",
-};
-
-defineExpose({
-  connectionPoints,
-});
-</script>
-
-<style scoped>
-.vue-flow__edge-path {
-  pointer-events: none;
-}
-</style>
-</file>
-
-<file path="components/icon/CloseIcon.vue">
-<template>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    class="w-6 h-6"
-  >
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M6 18L18 6M6 6l12 12"
     />
   </svg>
 </template>
@@ -896,6 +576,207 @@ defineEmits<{
 </script>
 </file>
 
+<file path="composables/useMindMapLayout.ts">
+import type { Node, Edge, XYPosition } from "@vue-flow/core";
+
+// Semantic levels supported when present in node.data.level
+export type NodeLevel =
+  | "CoreMarket"
+  | "Category"
+  | "Subcategory"
+  | "Niche"
+  | "SubNiche";
+
+const LEVEL_ORDER: Record<NodeLevel, number> = {
+  CoreMarket: 0,
+  Category: 1,
+  Subcategory: 2,
+  Niche: 3,
+  SubNiche: 4,
+};
+
+type LayoutOpts = {
+  rootId: string;
+  /** Base horizontal distance between columns (used if no levelGaps provided) */
+  levelGap?: number;
+  /** Base vertical distance between siblings (used if no rowGaps provided) */
+  rowGap?: number;
+  /** Where to place the root */
+  center?: XYPosition;
+  /** Optional per-column horizontal gaps; index == column */
+  levelGaps?: number[];
+  /** Optional per-column vertical gaps; index == column */
+  rowGaps?: number[];
+};
+
+export function layoutMindMap(
+  nodes: Node[],
+  edges: Edge[],
+  opts: LayoutOpts
+): Node[] {
+  const baseLevelGap = opts.levelGap ?? 280;
+  const baseRowGap = opts.rowGap ?? 100;
+  const center = opts.center ?? { x: 200, y: 200 };
+  const levelGaps = opts.levelGaps ?? [];
+  const rowGaps = opts.rowGaps ?? [];
+
+  const getLevelGap = (col: number) => levelGaps[col] ?? baseLevelGap;
+  const getRowGap = (col: number) => rowGaps[col] ?? baseRowGap;
+
+  // Quick indices
+  const nodeById = new Map<string, Node>();
+  nodes.forEach((n) => nodeById.set(n.id, n));
+
+  const children = new Map<string, string[]>();
+  const parentOf = new Map<string, string>();
+  edges.forEach((e) => {
+    if (!children.has(e.source)) children.set(e.source, []);
+    children.get(e.source)!.push(e.target);
+    parentOf.set(e.target, e.source);
+  });
+
+  // BFS fallback levels starting at root
+  const bfsLevel = new Map<string, number>();
+  const q: Array<[string, number]> = [[opts.rootId, 0]];
+  const seen = new Set<string>();
+  while (q.length) {
+    const [id, lvl] = q.shift()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    bfsLevel.set(id, lvl);
+    const kids = children.get(id) ?? [];
+    for (const kid of kids) q.push([kid, lvl + 1]);
+  }
+
+  // Column by semantic level when available, otherwise BFS
+  const colOf = (id: string): number => {
+    const n = nodeById.get(id);
+    const lvlName = (n?.data as any)?.level as NodeLevel | undefined;
+    if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
+    return bfsLevel.get(id) ?? 0;
+  };
+
+  // Precompute cumulative X offsets per column
+  const maxCol = Math.max(
+    0,
+    ...nodes.map((n) => {
+      const lvlName = (n.data as any)?.level as NodeLevel | undefined;
+      if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
+      return bfsLevel.get(n.id) ?? 0;
+    })
+  );
+  const colOffsetX: number[] = new Array(maxCol + 1).fill(0);
+  for (let c = 1; c <= maxCol; c++) {
+    colOffsetX[c] = colOffsetX[c - 1] + getLevelGap(c - 1);
+  }
+
+  // Position map we will fill
+  const positioned = new Map<string, XYPosition>();
+
+  // Place root so its visual center aligns to `center.y`
+  const rootNode = nodeById.get(opts.rootId) as any;
+  const rootLevel: string | undefined = rootNode?.data?.level;
+  const fallbackRootH = rootLevel === "CoreMarket" ? 88 : 24;
+  const rootH: number = rootNode?.dimensions?.height ?? fallbackRootH;
+  positioned.set(opts.rootId, { x: center.x, y: center.y - rootH / 2 });
+
+  // Walk columns from 1..max, group children by parent and stack around parent.y
+  for (let c = 1; c <= maxCol; c++) {
+    // collect all nodes that belong to column c
+    const idsAtCol = nodes.map((n) => n.id).filter((id) => colOf(id) === c);
+
+    if (!idsAtCol.length) continue;
+
+    // group by parent to keep siblings together
+    const groups = new Map<string, string[]>();
+    for (const id of idsAtCol) {
+      const p = parentOf.get(id);
+      if (!p) continue;
+      if (!groups.has(p)) groups.set(p, []);
+      groups.get(p)!.push(id);
+    }
+
+    // position each group near its parent
+    for (const [parentId, group] of groups) {
+      // parent might not be in same column; ensure we have its position
+      const pPos = positioned.get(parentId) ?? {
+        x: center.x + colOffsetX[colOf(parentId)],
+        y: center.y,
+      };
+      positioned.set(parentId, pPos);
+
+      const x = center.x + colOffsetX[c];
+      const gapY = getRowGap(c);
+      const total = (group.length - 1) * gapY;
+
+      // Parent visual midline
+      const parentNode = nodeById.get(parentId) as any;
+      const parentLevel: string | undefined = parentNode?.data?.level;
+      // Fallback heights by level to approximate visual center when dimensions are not yet available
+      const fallbackParentH =
+        parentLevel === "CoreMarket"
+          ? 88
+          : /* Category / Subcategory / Niche / SubNiche (lightweight text) */ 24;
+
+      const parentH: number = parentNode?.dimensions?.height ?? fallbackParentH;
+      const parentCenterY = pPos.y + parentH / 2;
+
+      // Provisional positions using tops spaced by gapY and a generic child height
+      const firstChild = nodeById.get(group[0]) as any;
+      const approxChildH: number = firstChild?.dimensions?.height ?? 24;
+      const startY = parentCenterY - total / 2 - approxChildH / 2;
+
+      // Stage provisional positions in an array to compute visual bbox
+      const provisional = group.map((id, idx) => ({
+        id,
+        x,
+        y: startY + idx * gapY,
+      }));
+
+      // Compute group visual bbox using measured heights when available
+      let minY = Number.POSITIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      const heights = new Map<string, number>();
+      for (const { id, y } of provisional) {
+        const child = nodeById.get(id) as any;
+        const h = child?.dimensions?.height ?? approxChildH;
+        heights.set(id, h);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y + h);
+      }
+
+      // Center group bbox midline to parent's center
+      const groupCenterY = (minY + maxY) / 2;
+      const deltaY = parentCenterY - groupCenterY;
+
+      // Persist final positions (shifted by deltaY)
+      for (const { id, x, y } of provisional) {
+        const finalY = y + deltaY;
+        positioned.set(id, { x, y: finalY });
+      }
+    }
+  }
+
+  // Ensure any nodes without parents (or ungrouped) still get a position by their column, stacking progressively
+  const fallbackCountPerCol = new Map<number, number>();
+  for (const n of nodes) {
+    if (positioned.has(n.id)) continue;
+    const c = colOf(n.id);
+    const x = center.x + colOffsetX[c];
+    const i = fallbackCountPerCol.get(c) ?? 0;
+    const y = center.y + (i - 0.5) * getRowGap(c);
+    fallbackCountPerCol.set(c, i + 1);
+    positioned.set(n.id, { x, y });
+  }
+
+  // Return nodes with position applied
+  return nodes.map((n) => {
+    const p = positioned.get(n.id);
+    return p ? { ...n, position: p, draggable: false } : n;
+  });
+}
+</file>
+
 <file path="layouts/blank.vue">
 <!-- layouts/blank.vue -->
 <template>
@@ -945,299 +826,6 @@ export default defineNuxtPlugin(() => {
 <file path="public/robots.txt">
 User-Agent: *
 Disallow:
-</file>
-
-<file path="stores/mindMapStore.ts">
-import { defineStore } from "pinia";
-import type { Node, Edge } from "@vue-flow/core";
-import { layoutMindMap } from "~/composables/useMindMapLayout";
-
-type NodeLevel =
-  | "CoreMarket"
-  | "Category"
-  | "Subcategory"
-  | "Niche"
-  | "SubNiche";
-
-export interface MindMapNode extends Node {
-  parentNode?: string;
-  data: {
-    label: string;
-    level: NodeLevel;
-    isRoot?: boolean;
-    iconName?: string;
-    children?: MindMapNode[];
-    isExpanded?: boolean;
-    edgeLabel?: string;
-  };
-}
-
-// Start with all nodes collapsed by default
-const initialNodes: MindMapNode[] = [
-  {
-    id: "health",
-    type: "custom",
-    data: {
-      label: "Saúde",
-      level: "CoreMarket",
-      isRoot: true,
-      iconName: "heart",
-      isExpanded: false,
-      children: [
-        {
-          id: "nutrition",
-          type: "custom",
-          data: {
-            label: "Nutrição e dieta",
-            level: "Category",
-            isRoot: false,
-            isExpanded: false,
-            edgeLabel: "Nutrição e dieta",
-            children: [
-              {
-                id: "diets",
-                type: "custom",
-                data: {
-                  label: "Dietas",
-                  level: "Subcategory",
-                  isExpanded: false,
-                  edgeLabel: "Dietas",
-                  children: [
-                    {
-                      id: "low-carb",
-                      type: "custom",
-                      data: {
-                        label: "Low-carb",
-                        level: "Niche",
-                        isExpanded: false,
-                        edgeLabel: "Low-carb",
-                        children: [
-                          {
-                            id: "low-carb-diabeticos",
-                            type: "custom",
-                            data: {
-                              label: "Receitas low-carb para diabéticos",
-                              level: "SubNiche",
-                              isExpanded: false,
-                              edgeLabel: "Receitas low-carb p/ diabéticos",
-                              children: [],
-                            },
-                            position: { x: 0, y: 0 },
-                          },
-                        ],
-                      },
-                      position: { x: 0, y: 0 },
-                    },
-                    {
-                      id: "plant-based",
-                      type: "custom",
-                      data: {
-                        label: "Plant-based",
-                        level: "Niche",
-                        isExpanded: false,
-                        edgeLabel: "Plant-based",
-                        children: [
-                          {
-                            id: "cardapios-economicos",
-                            type: "custom",
-                            data: {
-                              label: "Cardápios semanais econômicos",
-                              level: "SubNiche",
-                              isExpanded: false,
-                              edgeLabel: "Cardápios econômicos",
-                              children: [],
-                            },
-                            position: { x: 0, y: 0 },
-                          },
-                        ],
-                      },
-                      position: { x: 0, y: 0 },
-                    },
-                  ],
-                },
-                position: { x: 0, y: 0 },
-              },
-              {
-                id: "supplementation",
-                type: "custom",
-                data: {
-                  label: "Suplementação",
-                  level: "Subcategory",
-                  isExpanded: false,
-                  edgeLabel: "Suplementação",
-                  children: [
-                    {
-                      id: "performance",
-                      type: "custom",
-                      data: {
-                        label: "Performance esportiva",
-                        level: "Niche",
-                        isExpanded: false,
-                        edgeLabel: "Performance esportiva",
-                        children: [
-                          {
-                            id: "creatina-iniciantes",
-                            type: "custom",
-                            data: {
-                              label: "Creatina para iniciantes",
-                              level: "SubNiche",
-                              isExpanded: false,
-                              edgeLabel: "Creatina p/ iniciantes",
-                              children: [],
-                            },
-                            position: { x: 0, y: 0 },
-                          },
-                        ],
-                      },
-                      position: { x: 0, y: 0 },
-                    },
-                  ],
-                },
-                position: { x: 0, y: 0 },
-              },
-            ],
-          },
-          position: { x: 0, y: 0 },
-        },
-        {
-          id: "mental-wellness",
-          type: "custom",
-          data: {
-            label: "Bem estar mental",
-            level: "Category",
-            isRoot: false,
-            isExpanded: false,
-            edgeLabel: "Bem estar mental",
-            children: [],
-          },
-          position: { x: 0, y: 0 },
-        },
-        {
-          id: "fitness",
-          type: "custom",
-          data: {
-            label: "Fitness e atividade física",
-            level: "Category",
-            isRoot: false,
-            isExpanded: false,
-            edgeLabel: "Fitness e atividade física",
-            children: [],
-          },
-          position: { x: 0, y: 0 },
-        },
-      ],
-    },
-    position: { x: 0, y: 0 },
-  },
-  {
-    id: "wealth",
-    type: "custom",
-    data: {
-      label: "Prosperidade",
-      level: "CoreMarket",
-      isRoot: true,
-      isExpanded: false,
-      children: [],
-    },
-    position: { x: 0, y: 0 },
-  },
-  {
-    id: "relationships",
-    type: "custom",
-    data: {
-      label: "Relacionamentos",
-      level: "CoreMarket",
-      isRoot: true,
-      isExpanded: false,
-      children: [],
-    },
-    position: { x: 0, y: 0 },
-  },
-];
-
-export const useMindMapStore = defineStore("mindMap", {
-  state: () => ({
-    nodes: initialNodes,
-  }),
-
-  getters: {
-    // Single source of truth for all elements (nodes + edges)
-    elements(state): (MindMapNode | Edge)[] {
-      const elements: (MindMapNode | Edge)[] = [];
-
-      // Helper to flatten a tree respecting `isExpanded`
-      const flattenVisible = (root: MindMapNode) => {
-        const outNodes: MindMapNode[] = [];
-        const outEdges: Edge[] = [];
-
-        const walk = (node: MindMapNode) => {
-          outNodes.push({ ...node });
-          if (node.data.isExpanded && node.data.children?.length) {
-            for (const child of node.data.children) {
-              // ensure parent link for edge id/source
-              child.parentNode = node.id;
-              outEdges.push({
-                id: `edge-${node.id}-${child.id}`,
-                source: node.id,
-                target: child.id,
-                type: "smoothstep",
-                style: { stroke: "#6b7280", strokeWidth: 1.5 },
-                animated: false,
-                data: { label: child.data?.edgeLabel },
-              } as Edge);
-              walk(child);
-            }
-          }
-        };
-
-        walk(root);
-        return { nodes: outNodes, edges: outEdges };
-      };
-
-      // Layout options
-      const levelGap = 320;
-      const rowGap = 120;
-
-      // For each root, flatten, layout, and merge
-      state.nodes.forEach((root: MindMapNode, idx: number) => {
-        const { nodes, edges } = flattenVisible(root);
-
-        if (!nodes.length) return;
-
-        const positioned = layoutMindMap(nodes, edges, {
-          rootId: root.id,
-          levelGap,
-          rowGap,
-          center: { x: 120, y: 180 + idx * 220 },
-        }) as MindMapNode[];
-
-        // Merge nodes and edges for this root
-        for (const n of positioned) elements.push(n);
-        for (const e of edges) elements.push(e);
-      });
-
-      return elements;
-    },
-  },
-
-  actions: {
-    toggleNode(nodeId: string) {
-      const findAndToggle = (nodes: MindMapNode[]): boolean => {
-        for (const node of nodes) {
-          if (node.id === nodeId) {
-            node.data.isExpanded = !node.data.isExpanded;
-            return true;
-          }
-          if (node.data.children && findAndToggle(node.data.children)) {
-            return true;
-          }
-        }
-        return false;
-      };
-      findAndToggle(this.nodes);
-    },
-  },
-});
 </file>
 
 <file path="types/components.d.ts">
@@ -2103,6 +1691,257 @@ export {}
 }
 </file>
 
+<file path="components/canvas/MindMapNode.vue">
+<template>
+  <div
+    class="group relative w-auto select-none"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+    tabindex="0"
+  >
+    <Handle
+      type="source"
+      :position="Position.Right"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <Handle
+      type="target"
+      :position="Position.Left"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <!-- ROOT: sempre card -->
+    <div
+      v-if="data.level === 'CoreMarket'"
+      class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
+      :class="{
+        'border-blue-500 border-2': selected,
+        'hover:border-blue-400': !selected,
+      }"
+    >
+      <!-- Input connection point (left) -->
+      <div
+        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
+      />
+
+      <!-- Node content -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center mb-1">
+          <div class="mr-2 flex items-center" v-if="data.iconName">
+            <component :is="ICONS[data.iconName]" v-if="ICONS[data.iconName]" />
+          </div>
+          <div class="font-semibold text-sm flex-grow text-white">
+            {{ data.label || label }}
+          </div>
+        </div>
+        <div class="text-xs opacity-90 mt-1" v-if="data.description">
+          {{ data.description }}
+        </div>
+      </div>
+
+      <!-- Output connection point (right) -->
+      <div
+        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
+      />
+    </div>
+
+    <!-- External connector + button (root) -->
+    <div
+      v-if="hasChildren && data.level === 'CoreMarket'"
+      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10"
+    >
+      <!-- connector line (fixed, ends before the button) -->
+      <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+      <!-- outlined circle button drawing +/- with CSS -->
+      <button
+        @click.stop="toggle"
+        aria-label="Expandir/contrair"
+        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+        :class="{
+          // show vertical bar only when collapsed (plus)
+          'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+            !isExpanded,
+        }"
+      />
+    </div>
+
+    <!-- NÃO-ROOT: lightweight por padrão, card no hover/focus -->
+    <div v-if="data.level !== 'CoreMarket'" class="w-64">
+      <!-- Lightweight (texto simples) -->
+      <span
+        class="block text-sm text-white leading-snug truncate group-hover:hidden group-focus-visible:hidden"
+      >
+        {{ data.label || label }}
+      </span>
+
+      <!-- Card no hover/focus -->
+      <div
+        class="hidden group-hover:flex group-focus-visible:flex p-3 rounded-lg bg-[#1d1d1f] border border-gray-800 shadow-lg transition-all duration-200 items-start gap-2"
+        :class="{
+          'border-blue-500 border-2': selected,
+          'hover:border-blue-400': !selected,
+        }"
+      >
+        <!-- Input connection point (left) -->
+        <div
+          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
+        />
+
+        <!-- Node content -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center mb-1">
+            <div class="mr-2 flex items-center" v-if="data.iconName">
+              <component
+                :is="ICONS[data.iconName]"
+                v-if="ICONS[data.iconName]"
+              />
+            </div>
+            <div class="font-semibold text-lg flex-grow text-white">
+              {{ data.label || label }}
+            </div>
+          </div>
+          <div class="text-xs opacity-90 mt-1" v-if="data.description">
+            {{ data.description }}
+          </div>
+          <div class="mt-2 flex gap-2">
+            <button
+              v-if="data.onPrimary"
+              class="rounded-md bg-white/10 px-2 py-1 text-xs hover:bg-white/20 text-white"
+              @click.stop="data.onPrimary?.()"
+            >
+              Pesquisar categoria
+            </button>
+          </div>
+        </div>
+
+        <!-- Output connection point (right) -->
+        <div
+          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
+        />
+      </div>
+
+      <!-- External connector + button (non-root, shows on hover) -->
+      <div
+        v-if="hasChildren && data.level !== 'CoreMarket'"
+        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
+      >
+        <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+        <button
+          @click.stop="toggle"
+          aria-label="Expandir/contrair"
+          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+          :class="{
+            'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+              !isExpanded,
+          }"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Auto-imported in Nuxt 3: ref, computed, nextTick, defineAsyncComponent
+import HeartIcon from "~/components/icon/HeartIcon.vue";
+
+// Use Vue Flow and store
+const { useVueFlow } = await import("@vue-flow/core");
+const { useMindMapStore } = await import("~/stores/mindMapStore");
+const { Handle, Position } = await import("@vue-flow/core");
+
+const isHovered = ref(false);
+const store = useMindMapStore();
+const { updateNodeInternals } = useVueFlow();
+
+// Non-reactive icon registry
+const ICONS: Record<string, any> = {
+  heart: HeartIcon,
+};
+
+// Component props
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+  data: {
+    type: Object,
+    required: true,
+    default: () => ({
+      level: "Category",
+      isExpanded: false,
+      children: [],
+    }),
+  },
+  label: {
+    type: String,
+    default: "",
+  },
+  type: {
+    type: String,
+    default: "default",
+  },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
+  isConnectable: {
+    type: Boolean,
+    default: true,
+  },
+  position: {
+    type: Object,
+    required: true,
+    default: () => ({ x: 0, y: 0 }),
+  },
+  // Vue Flow connection points
+  sourcePosition: {
+    type: String,
+    default: "right",
+  },
+  targetPosition: {
+    type: String,
+    default: "left",
+  },
+});
+
+// Computed properties
+const hasChildren = computed(() => {
+  return props.data?.children?.length > 0;
+});
+
+const isExpanded = computed(() => {
+  return !!props.data?.isExpanded;
+});
+
+// Toggle node expansion
+const toggle = () => {
+  store.toggleNode(props.id);
+  // Force Vue Flow to recalculate after state change on the next frame
+  if (typeof window !== "undefined") {
+    requestAnimationFrame(() => {
+      updateNodeInternals();
+    });
+  }
+};
+
+// Expose connection points for Vue Flow
+const connectionPoints = {
+  source: "right",
+  target: "left",
+};
+
+defineExpose({
+  connectionPoints,
+});
+</script>
+
+<style scoped>
+.vue-flow__edge-path {
+  pointer-events: none;
+}
+</style>
+</file>
+
 <file path="pages/login.vue">
 <template>
   <div
@@ -2363,6 +2202,353 @@ const handleRegister = async () => {
     </div>
   </div>
 </template>
+</file>
+
+<file path="stores/mindMapStore.ts">
+import { defineStore } from "pinia";
+import type { Node, Edge } from "@vue-flow/core";
+import { layoutMindMap } from "~/composables/useMindMapLayout";
+
+type NodeLevel =
+  | "CoreMarket"
+  | "Category"
+  | "Subcategory"
+  | "Niche"
+  | "SubNiche";
+
+export interface MindMapNode extends Node {
+  parentNode?: string;
+  data: {
+    label: string;
+    level: NodeLevel;
+    iconName?: string;
+    children?: MindMapNode[];
+    isExpanded?: boolean;
+    edgeLabel?: string;
+  };
+}
+
+// Start with all nodes collapsed by default
+const initialNodes: MindMapNode[] = [
+  {
+    id: "health",
+    type: "custom",
+    data: {
+      label: "Saúde",
+      level: "CoreMarket",
+      iconName: "heart",
+      isExpanded: false,
+      children: [
+        {
+          id: "nutrition",
+          type: "custom",
+          data: {
+            label: "Nutrição e dieta",
+            level: "Category",
+            isExpanded: false,
+            edgeLabel: "Nutrição e dieta",
+            children: [
+              {
+                id: "diets",
+                type: "custom",
+                data: {
+                  label: "Dietas",
+                  level: "Subcategory",
+                  isExpanded: false,
+                  edgeLabel: "Dietas",
+                  children: [
+                    {
+                      id: "low-carb",
+                      type: "custom",
+                      data: {
+                        label: "Low-carb",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Low-carb",
+                        children: [
+                          {
+                            id: "low-carb-diabeticos",
+                            type: "custom",
+                            data: {
+                              label: "Receitas low-carb para diabéticos",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Receitas low-carb p/ diabéticos",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                    {
+                      id: "plant-based",
+                      type: "custom",
+                      data: {
+                        label: "Plant-based",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Plant-based",
+                        children: [
+                          {
+                            id: "cardapios-economicos",
+                            type: "custom",
+                            data: {
+                              label: "Cardápios semanais econômicos",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Cardápios econômicos",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                  ],
+                },
+                position: { x: 0, y: 0 },
+              },
+              {
+                id: "supplementation",
+                type: "custom",
+                data: {
+                  label: "Suplementação",
+                  level: "Subcategory",
+                  isExpanded: false,
+                  edgeLabel: "Suplementação",
+                  children: [
+                    {
+                      id: "performance",
+                      type: "custom",
+                      data: {
+                        label: "Performance esportiva",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Performance esportiva",
+                        children: [
+                          {
+                            id: "creatina-iniciantes",
+                            type: "custom",
+                            data: {
+                              label: "Creatina para iniciantes",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Creatina p/ iniciantes",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                  ],
+                },
+                position: { x: 0, y: 0 },
+              },
+            ],
+          },
+          position: { x: 0, y: 0 },
+        },
+        {
+          id: "mental-wellness",
+          type: "custom",
+          data: {
+            label: "Bem estar mental",
+            level: "Category",
+            isExpanded: false,
+            edgeLabel: "Bem estar mental",
+            children: [],
+          },
+          position: { x: 0, y: 0 },
+        },
+        {
+          id: "fitness",
+          type: "custom",
+          data: {
+            label: "Fitness e atividade física",
+            level: "Category",
+            isExpanded: false,
+            edgeLabel: "Fitness e atividade física",
+            children: [],
+          },
+          position: { x: 0, y: 0 },
+        },
+      ],
+    },
+    position: { x: 0, y: 0 },
+  },
+  {
+    id: "wealth",
+    type: "custom",
+    data: {
+      label: "Prosperidade",
+      level: "CoreMarket",
+      isExpanded: false,
+      children: [],
+    },
+    position: { x: 0, y: 0 },
+  },
+  {
+    id: "relationships",
+    type: "custom",
+    data: {
+      label: "Relacionamentos",
+      level: "CoreMarket",
+      isExpanded: false,
+      children: [],
+    },
+    position: { x: 0, y: 0 },
+  },
+];
+
+export const useMindMapStore = defineStore("mindMap", {
+  state: () => ({
+    nodes: initialNodes,
+  }),
+
+  getters: {
+    // Nós posicionados para o Vue Flow
+    flowNodes(state): Node[] {
+      const allNodes: Node[] = [];
+
+      const flattenVisible = (root: MindMapNode) => {
+        const outNodes: MindMapNode[] = [];
+        const outEdges: Edge[] = [];
+
+        const walk = (node: MindMapNode) => {
+          outNodes.push({ ...node });
+          if (node.data.isExpanded && node.data.children?.length) {
+            for (const child of node.data.children) {
+              child.parentNode = node.id;
+              outEdges.push({
+                id: `edge-${node.id}-${child.id}`,
+                source: node.id,
+                target: child.id,
+                type: "smoothstep",
+                style: { stroke: "#6b7280", strokeWidth: 1.5 },
+                animated: false,
+                data: { label: child.data?.edgeLabel },
+              } as Edge);
+              walk(child);
+            }
+          }
+        };
+
+        walk(root);
+        return { nodes: outNodes, edges: outEdges };
+      };
+
+      // gaps por nível (colunas) — pode ajustar à vontade
+      const levelGaps = [380, 320, 260, 220, 200];
+      const rowGaps = [140, 120, 100, 84, 72];
+
+      // Para cada root, achata, faz layout e junta
+      state.nodes.forEach((root: MindMapNode, idx: number) => {
+        const { nodes, edges } = flattenVisible(root);
+        if (!nodes.length) return;
+
+        const positioned = layoutMindMap(nodes, edges, {
+          rootId: root.id,
+          levelGap: 320,
+          rowGap: 120,
+          levelGaps,
+          rowGaps,
+          center: { x: 160, y: 200 + idx * 220 },
+        }) as MindMapNode[];
+
+        // garante que ao menos o root apareça mesmo se algo falhar
+        if (!positioned || positioned.length === 0) {
+          allNodes.push({
+            ...root,
+            position: { x: 160, y: 200 + idx * 220 },
+            draggable: false,
+            selectable: false,
+          } as MindMapNode);
+          return;
+        }
+
+        positioned.forEach((n) => allNodes.push(n));
+      });
+
+      // fallback global: renderiza roots mesmo se nada vier
+      if (allNodes.length === 0 && state.nodes?.length) {
+        state.nodes.forEach((root: MindMapNode, idx: number) => {
+          allNodes.push({
+            ...root,
+            position: { x: 160, y: 200 + idx * 220 },
+            draggable: false,
+            selectable: false,
+          } as MindMapNode);
+        });
+      }
+
+      return allNodes;
+    },
+
+    // Arestas derivadas dos nós visíveis/expandidos
+    flowEdges(state): Edge[] {
+      const allEdges: Edge[] = [];
+
+      const collect = (root: MindMapNode) => {
+        const outEdges: Edge[] = [];
+        const walk = (node: MindMapNode) => {
+          if (node.data.isExpanded && node.data.children?.length) {
+            for (const child of node.data.children) {
+              outEdges.push({
+                id: `edge-${node.id}-${child.id}`,
+                source: node.id,
+                target: child.id,
+                type: "smoothstep",
+                style: { stroke: "#6b7280", strokeWidth: 1.5 },
+                animated: false,
+                data: { label: child.data?.edgeLabel },
+              } as Edge);
+              walk(child);
+            }
+          }
+        };
+        walk(root);
+        return outEdges;
+      };
+
+      state.nodes.forEach((root: MindMapNode) => {
+        collect(root).forEach((e) => allEdges.push(e));
+      });
+
+      return allEdges;
+    },
+  },
+
+  actions: {
+    toggleNode(nodeId: string) {
+      const findAndToggle = (nodes: MindMapNode[]): boolean => {
+        for (const node of nodes) {
+          if (node.id === nodeId) {
+            node.data.isExpanded = !node.data.isExpanded;
+            return true;
+          }
+          if (node.data.children && findAndToggle(node.data.children)) {
+            return true;
+          }
+        }
+        return false;
+      };
+      findAndToggle(this.nodes);
+    },
+
+    // Opcional: usados quando o Vue Flow tenta escrever via v-model
+    replaceFlowNodes(_val: Node[]) {
+      // no-op: posições são derivadas pelo layout
+    },
+    replaceFlowEdges(_val: Edge[]) {
+      // no-op: edges são derivadas da árvore
+    },
+  },
+});
 </file>
 
 <file path="nuxt.config.ts">
@@ -2710,7 +2896,7 @@ onUnmounted(() => {
             v-model:edges="modelEdges"
             :node-types="nodeTypes"
             :default-viewport="{ zoom: 0.8 }"
-            :min-zoom="0.1"
+            :min-zoom="0.5"
             :max-zoom="4"
             :snap-to-grid="false"
             :elevate-nodes-on-select="true"
@@ -2732,6 +2918,7 @@ onUnmounted(() => {
             style="background-color: #0d0d12"
             @node-click="onNodeClick"
             @pane-click="onPaneClick"
+            @init="onFlowInit"
           >
             <Background
               pattern-color="#393939"
@@ -2754,7 +2941,7 @@ onUnmounted(() => {
 
 <script setup>
 import { markRaw } from "vue";
-import { VueFlow } from "@vue-flow/core";
+import { VueFlow, useVueFlow } from "@vue-flow/core";
 import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
 import "@vue-flow/core/dist/style.css";
@@ -2782,6 +2969,35 @@ const flowContainerRef = ref(null);
 const modelNodes = ref([]);
 const modelEdges = ref([]);
 
+const { fitView, viewportInitialized } = useVueFlow();
+
+const flowReady = ref(false);
+const onFlowInit = () => {
+  flowReady.value = true;
+  // wait next tick to ensure DOM nodes are measured
+  nextTick(() => {
+    try {
+      fitView({ padding: 0.2 });
+    } catch (e) {
+      /* ignore */
+    }
+  });
+};
+
+watch(
+  modelNodes,
+  async () => {
+    await nextTick();
+    if (!flowReady.value || !viewportInitialized?.value) return;
+    try {
+      fitView({ padding: 0.2 });
+    } catch (e) {
+      /* ignore */
+    }
+  },
+  { immediate: true }
+);
+
 watch(
   () => mindMapStore.flowNodes,
   (val) => {
@@ -2800,7 +3016,6 @@ watch(
 );
 
 // Computed properties
-const elements = computed(() => mindMapStore.elements);
 
 const nodeTypes = {
   custom: markRaw(MindMapNode),

@@ -19,16 +19,7 @@
     <div
       v-if="data.level === 'CoreMarket'"
       class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
-      :class="{
-        'border-blue-500 border-2': selected,
-        'hover:border-blue-400': !selected,
-      }"
     >
-      <!-- Input connection point (left) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-      />
-
       <!-- Node content -->
       <div class="flex-1 min-w-0">
         <div class="flex items-center mb-1">
@@ -45,23 +36,32 @@
       </div>
 
       <!-- Output connection point (right) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-      />
     </div>
 
     <!-- External connector + button (root) -->
     <div
       v-if="hasChildren && data.level === 'CoreMarket'"
-      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10"
+      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 group nodrag nowheel nopan"
+      @mousedown.stop
+      @pointerdown.stop
+      @wheel.stop.prevent
+      @touchstart.stop
+      @dblclick.stop.prevent
     >
       <!-- connector line (fixed, ends before the button) -->
       <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
       <!-- outlined circle button drawing +/- with CSS -->
       <button
+        type="button"
+        @mousedown.stop
+        @pointerdown.stop
+        @wheel.stop.prevent
+        @touchstart.stop
         @click.stop="toggle"
+        @dblclick.stop.prevent
         aria-label="Expandir/contrair"
-        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded hover:border-[#8E6CE4] hover:before:bg-[#8E6CE4] hover:after:bg-[#8E6CE4] nodrag nowheel nopan"
+        style="touch-action: manipulation"
         :class="{
           // show vertical bar only when collapsed (plus)
           'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
@@ -87,11 +87,6 @@
           'hover:border-blue-400': !selected,
         }"
       >
-        <!-- Input connection point (left) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-        />
-
         <!-- Node content -->
         <div class="flex-1 min-w-0">
           <div class="flex items-center mb-1">
@@ -118,23 +113,30 @@
             </button>
           </div>
         </div>
-
-        <!-- Output connection point (right) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-        />
       </div>
 
       <!-- External connector + button (non-root, shows on hover) -->
       <div
         v-if="hasChildren && data.level !== 'CoreMarket'"
-        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
+        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity group nodrag nowheel nopan"
+        @mousedown.stop
+        @pointerdown.stop
+        @wheel.stop.prevent
+        @touchstart.stop
+        @dblclick.stop.prevent
       >
-        <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+        <div class="h-[2px] bg-[#5A5A60]"></div>
         <button
+          type="button"
+          @mousedown.stop
+          @pointerdown.stop
+          @wheel.stop.prevent
+          @touchstart.stop
           @click.stop="toggle"
+          @dblclick.stop.prevent
           aria-label="Expandir/contrair"
-          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded hover:border-[#8E6CE4] hover:before:bg-[#8E6CE4] hover:after:bg-[#8E6CE4] nodrag nowheel nopan"
+          style="touch-action: manipulation"
           :class="{
             'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
               !isExpanded,

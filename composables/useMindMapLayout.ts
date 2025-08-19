@@ -94,8 +94,12 @@ export function layoutMindMap(
   // Position map we will fill
   const positioned = new Map<string, XYPosition>();
 
-  // Place root at center
-  positioned.set(opts.rootId, { x: center.x, y: center.y });
+  // Place root so its visual center aligns to `center.y`
+  const rootNode = nodeById.get(opts.rootId) as any;
+  const rootLevel: string | undefined = rootNode?.data?.level;
+  const fallbackRootH = rootLevel === "CoreMarket" ? 88 : 24;
+  const rootH: number = rootNode?.dimensions?.height ?? fallbackRootH;
+  positioned.set(opts.rootId, { x: center.x, y: center.y - rootH / 2 });
 
   // Walk columns from 1..max, group children by parent and stack around parent.y
   for (let c = 1; c <= maxCol; c++) {
@@ -125,10 +129,52 @@ export function layoutMindMap(
       const x = center.x + colOffsetX[c];
       const gapY = getRowGap(c);
       const total = (group.length - 1) * gapY;
-      const startY = pPos.y - total / 2;
-      group.forEach((id, idx) => {
-        positioned.set(id, { x, y: startY + idx * gapY });
-      });
+
+      // Parent visual midline
+      const parentNode = nodeById.get(parentId) as any;
+      const parentLevel: string | undefined = parentNode?.data?.level;
+      // Fallback heights by level to approximate visual center when dimensions are not yet available
+      const fallbackParentH =
+        parentLevel === "CoreMarket"
+          ? 88
+          : /* Category / Subcategory / Niche / SubNiche (lightweight text) */ 24;
+
+      const parentH: number = parentNode?.dimensions?.height ?? fallbackParentH;
+      const parentCenterY = pPos.y + parentH / 2;
+
+      // Provisional positions using tops spaced by gapY and a generic child height
+      const firstChild = nodeById.get(group[0]) as any;
+      const approxChildH: number = firstChild?.dimensions?.height ?? 24;
+      const startY = parentCenterY - total / 2 - approxChildH / 2;
+
+      // Stage provisional positions in an array to compute visual bbox
+      const provisional = group.map((id, idx) => ({
+        id,
+        x,
+        y: startY + idx * gapY,
+      }));
+
+      // Compute group visual bbox using measured heights when available
+      let minY = Number.POSITIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      const heights = new Map<string, number>();
+      for (const { id, y } of provisional) {
+        const child = nodeById.get(id) as any;
+        const h = child?.dimensions?.height ?? approxChildH;
+        heights.set(id, h);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y + h);
+      }
+
+      // Center group bbox midline to parent's center
+      const groupCenterY = (minY + maxY) / 2;
+      const deltaY = parentCenterY - groupCenterY;
+
+      // Persist final positions (shifted by deltaY)
+      for (const { id, x, y } of provisional) {
+        const finalY = y + deltaY;
+        positioned.set(id, { x, y: finalY });
+      }
     }
   }
 
