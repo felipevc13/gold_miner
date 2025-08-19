@@ -1,152 +1,325 @@
 import { defineStore } from "pinia";
-import type { Node, Edge, XYPosition } from "@vue-flow/core";
+import type { Node, Edge } from "@vue-flow/core";
+import { layoutMindMap } from "~/composables/useMindMapLayout";
 
-// Interface para os dados extras dos nós
-export interface MindMapNodeData {
-  label: string;
-  children?: MindMapNode[];
-  isExpanded?: boolean;
+type NodeLevel =
+  | "CoreMarket"
+  | "Category"
+  | "Subcategory"
+  | "Niche"
+  | "SubNiche";
+
+export interface MindMapNode extends Node {
+  parentNode?: string;
+  data: {
+    label: string;
+    level: NodeLevel;
+    isRoot?: boolean;
+    iconName?: string;
+    children?: MindMapNode[];
+    isExpanded?: boolean;
+    edgeLabel?: string;
+  };
 }
 
-// Definindo o tipo para os nossos nós, que terão dados extras
-export interface MindMapNode extends Node<MindMapNodeData> {
-  data: MindMapNodeData;
-  position: XYPosition;
-  id: string;
-  type?: string;
-}
-
-// Type guard para verificar se um nó é um MindMapNode
-function isMindMapNode(node: any): node is MindMapNode {
-  return node && 
-         typeof node === 'object' && 
-         'id' in node && 
-         'data' in node && 
-         'position' in node &&
-         typeof node.position === 'object' &&
-         node.position !== null &&
-         'x' in node.position &&
-         'y' in node.position;
-}
-
-// Dados iniciais para o mind map (mock)
+// Start with all nodes collapsed by default
 const initialNodes: MindMapNode[] = [
   {
     id: "health",
     type: "custom",
     data: {
       label: "Saúde",
+      level: "CoreMarket",
+      isRoot: true,
+      iconName: "heart",
+      isExpanded: false,
       children: [
         {
           id: "nutrition",
           type: "custom",
-          data: { label: "Nutrição e Dieta", children: [] },
+          data: {
+            label: "Nutrição e dieta",
+            level: "Category",
+            isRoot: false,
+            isExpanded: false,
+            edgeLabel: "Nutrição e dieta",
+            children: [
+              {
+                id: "diets",
+                type: "custom",
+                data: {
+                  label: "Dietas",
+                  level: "Subcategory",
+                  isExpanded: false,
+                  edgeLabel: "Dietas",
+                  children: [
+                    {
+                      id: "low-carb",
+                      type: "custom",
+                      data: {
+                        label: "Low-carb",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Low-carb",
+                        children: [
+                          {
+                            id: "low-carb-diabeticos",
+                            type: "custom",
+                            data: {
+                              label: "Receitas low-carb para diabéticos",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Receitas low-carb p/ diabéticos",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                    {
+                      id: "plant-based",
+                      type: "custom",
+                      data: {
+                        label: "Plant-based",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Plant-based",
+                        children: [
+                          {
+                            id: "cardapios-economicos",
+                            type: "custom",
+                            data: {
+                              label: "Cardápios semanais econômicos",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Cardápios econômicos",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                  ],
+                },
+                position: { x: 0, y: 0 },
+              },
+              {
+                id: "supplementation",
+                type: "custom",
+                data: {
+                  label: "Suplementação",
+                  level: "Subcategory",
+                  isExpanded: false,
+                  edgeLabel: "Suplementação",
+                  children: [
+                    {
+                      id: "performance",
+                      type: "custom",
+                      data: {
+                        label: "Performance esportiva",
+                        level: "Niche",
+                        isExpanded: false,
+                        edgeLabel: "Performance esportiva",
+                        children: [
+                          {
+                            id: "creatina-iniciantes",
+                            type: "custom",
+                            data: {
+                              label: "Creatina para iniciantes",
+                              level: "SubNiche",
+                              isExpanded: false,
+                              edgeLabel: "Creatina p/ iniciantes",
+                              children: [],
+                            },
+                            position: { x: 0, y: 0 },
+                          },
+                        ],
+                      },
+                      position: { x: 0, y: 0 },
+                    },
+                  ],
+                },
+                position: { x: 0, y: 0 },
+              },
+            ],
+          },
           position: { x: 0, y: 0 },
         },
         {
           id: "mental-wellness",
           type: "custom",
-          data: { label: "Bem estar mental", children: [] },
+          data: {
+            label: "Bem estar mental",
+            level: "Category",
+            isRoot: false,
+            isExpanded: false,
+            edgeLabel: "Bem estar mental",
+            children: [],
+          },
           position: { x: 0, y: 0 },
         },
         {
           id: "fitness",
           type: "custom",
-          data: { label: "Fitness e Atividade Física", children: [] },
+          data: {
+            label: "Fitness e atividade física",
+            level: "Category",
+            isRoot: false,
+            isExpanded: false,
+            edgeLabel: "Fitness e atividade física",
+            children: [],
+          },
           position: { x: 0, y: 0 },
         },
       ],
     },
-    position: { x: 50, y: 200 },
+    position: { x: 0, y: 0 },
   },
   {
     id: "wealth",
     type: "custom",
-    data: { label: "Prosperidade", children: [] },
-    position: { x: 50, y: 300 },
+    data: {
+      label: "Prosperidade",
+      level: "CoreMarket",
+      isRoot: true,
+      isExpanded: false,
+      children: [],
+    },
+    position: { x: 0, y: 0 },
   },
   {
     id: "relationships",
     type: "custom",
-    data: { label: "Relacionamentos", children: [] },
-    position: { x: 50, y: 400 },
+    data: {
+      label: "Relacionamentos",
+      level: "CoreMarket",
+      isRoot: true,
+      isExpanded: false,
+      children: [],
+    },
+    position: { x: 0, y: 0 },
   },
 ];
 
 export const useMindMapStore = defineStore("mindMap", {
   state: () => ({
-    nodes: initialNodes as MindMapNode[],
+    nodes: initialNodes,
   }),
 
   getters: {
-    // Getter que "achata" a árvore de nós e calcula as arestas dinamicamente
-    visibleElements: (state): (MindMapNode | Edge)[] => {
-      const elements: (MindMapNode | Edge)[] = [];
-      const nodeMap = new Map<string, MindMapNode>(state.nodes.map((n: MindMapNode) => [n.id, n]));
+    // Nós posicionados para o Vue Flow
+    flowNodes(state): Node[] {
+      const allNodes: Node[] = [];
 
-      function traverse(
-        node: MindMapNode,
-        parentPosition: XYPosition,
-        level = 0
-      ) {
-        // Lógica de layout simples para o mind map
-        const xOffset = 250;
-        const yGap = 120;
+      const flattenVisible = (root: MindMapNode) => {
+        const outNodes: MindMapNode[] = [];
+        const outEdges: Edge[] = [];
 
-        node.position = {
-          x: parentPosition.x + xOffset * level,
-          y: parentPosition.y,
+        const walk = (node: MindMapNode) => {
+          outNodes.push({ ...node });
+          if (node.data.isExpanded && node.data.children?.length) {
+            for (const child of node.data.children) {
+              child.parentNode = node.id;
+              outEdges.push({
+                id: `edge-${node.id}-${child.id}`,
+                source: node.id,
+                target: child.id,
+                type: "smoothstep",
+                style: { stroke: "#6b7280", strokeWidth: 1.5 },
+                animated: false,
+                data: { label: child.data?.edgeLabel },
+              } as Edge);
+              walk(child);
+            }
+          }
         };
 
-        elements.push(node);
+        walk(root);
+        return { nodes: outNodes, edges: outEdges };
+      };
 
-        if (node.data.isExpanded && node.data.children) {
-          const childrenCount = node.data.children.length;
-          const totalHeight = (childrenCount - 1) * yGap;
-          let startY = node.position.y - totalHeight / 2;
+      // gaps por nível (colunas) — pode ajustar à vontade
+      const levelGaps = [380, 320, 260, 220, 200];
+      const rowGaps = [140, 120, 100, 84, 72];
 
-          node.data.children.forEach((childNode) => {
-            const existingNode = nodeMap.get(childNode.id);
-          const childFull = existingNode || {
-            ...childNode,
-            position: { x: 0, y: 0 },
-            data: { 
-              ...childNode.data,
-              children: childNode.data.children || []
-            }
-          } as MindMapNode;
-          
-          childFull.position = { 
-            x: node.position.x + xOffset, 
-            y: startY 
-          };
+      // Para cada root, achata, faz layout e junta
+      state.nodes.forEach((root: MindMapNode, idx: number) => {
+        const { nodes, edges } = flattenVisible(root);
+        if (!nodes.length) return;
 
-          elements.push({
-            id: `edge-${node.id}-${childFull.id}`,
-            source: node.id,
-            target: childFull.id,
-            type: "smoothstep",
-          });
+        const positioned = layoutMindMap(nodes, edges, {
+          rootId: root.id,
+          levelGap: 320,
+          rowGap: 120,
+          levelGaps,
+          rowGaps,
+          center: { x: 160, y: 200 + idx * 220 },
+        }) as MindMapNode[];
 
-            traverse(
-              childFull,
-              { x: node.position.x + xOffset, y: startY },
-              level + 1
-            );
-            startY += yGap;
-          });
+        // garante que ao menos o root apareça mesmo se algo falhar
+        if (!positioned || positioned.length === 0) {
+          allNodes.push({
+            ...root,
+            position: { x: 160, y: 200 + idx * 220 },
+            draggable: false,
+            selectable: false,
+          } as MindMapNode);
+          return;
         }
-      }
 
-      // Itera sobre os nós raiz
-      state.nodes.forEach((rootNode: MindMapNode, index: number) => {
-        if (isMindMapNode(rootNode)) {
-          const rootYPosition = 200 + index * 150; // Espaçamento vertical entre os nós raiz
-          traverse(rootNode, { x: 50, y: rootYPosition }, 0);
-        }
+        positioned.forEach((n) => allNodes.push(n));
       });
 
-      return elements;
+      // fallback global: renderiza roots mesmo se nada vier
+      if (allNodes.length === 0 && state.nodes?.length) {
+        state.nodes.forEach((root: MindMapNode, idx: number) => {
+          allNodes.push({
+            ...root,
+            position: { x: 160, y: 200 + idx * 220 },
+            draggable: false,
+            selectable: false,
+          } as MindMapNode);
+        });
+      }
+
+      return allNodes;
+    },
+
+    // Arestas derivadas dos nós visíveis/expandidos
+    flowEdges(state): Edge[] {
+      const allEdges: Edge[] = [];
+
+      const collect = (root: MindMapNode) => {
+        const outEdges: Edge[] = [];
+        const walk = (node: MindMapNode) => {
+          if (node.data.isExpanded && node.data.children?.length) {
+            for (const child of node.data.children) {
+              outEdges.push({
+                id: `edge-${node.id}-${child.id}`,
+                source: node.id,
+                target: child.id,
+                type: "smoothstep",
+                style: { stroke: "#6b7280", strokeWidth: 1.5 },
+                animated: false,
+                data: { label: child.data?.edgeLabel },
+              } as Edge);
+              walk(child);
+            }
+          }
+        };
+        walk(root);
+        return outEdges;
+      };
+
+      state.nodes.forEach((root: MindMapNode) => {
+        collect(root).forEach((e) => allEdges.push(e));
+      });
+
+      return allEdges;
     },
   },
 
@@ -165,6 +338,14 @@ export const useMindMapStore = defineStore("mindMap", {
         return false;
       };
       findAndToggle(this.nodes);
+    },
+
+    // Opcional: usados quando o Vue Flow tenta escrever via v-model
+    replaceFlowNodes(_val: Node[]) {
+      // no-op: posições são derivadas pelo layout
+    },
+    replaceFlowEdges(_val: Edge[]) {
+      // no-op: edges são derivadas da árvore
     },
   },
 });

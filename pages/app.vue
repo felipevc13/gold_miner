@@ -33,24 +33,33 @@
       <ClientOnly>
         <div ref="flowContainerRef" class="vue-flow-container absolute inset-0">
           <VueFlow
-            v-model="elements"
+            v-model:nodes="modelNodes"
+            v-model:edges="modelEdges"
             :node-types="nodeTypes"
             :default-viewport="{ zoom: 0.8 }"
-            :min-zoom="0.1"
+            :min-zoom="0.5"
             :max-zoom="4"
             :snap-to-grid="false"
             :elevate-nodes-on-select="true"
             :nodes-draggable="false"
+            :nodes-connectable="false"
+            :edges-updatable="false"
+            :elements-selectable="false"
             :default-edge-options="{
               type: 'smoothstep',
+              style: { stroke: '#6b7280', strokeWidth: 1.5 },
               animated: false,
-              style: { stroke: '#4B5563', strokeWidth: 2 },
             }"
+            :node-extent="[
+              [0, 0],
+              [Infinity, Infinity],
+            ]"
             fit-view-on-init
             class="basicflow"
             style="background-color: #0d0d12"
             @node-click="onNodeClick"
             @pane-click="onPaneClick"
+            @init="onFlowInit"
           >
             <Background
               pattern-color="#393939"
@@ -71,39 +80,113 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { VueFlow } from "@vue-flow/core";
+<script setup>
+import { markRaw } from "vue";
+import { VueFlow, useVueFlow } from "@vue-flow/core";
 import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
 import "@vue-flow/core/dist/style.css";
 import "@vue-flow/core/dist/theme-default.css";
 import "@vue-flow/controls/dist/style.css";
-import { useRouter } from "vue-router";
-import { useSupabaseUser } from "#imports";
-import Header from "~/components/Header.vue";
-import { useMindMapStore } from "~/stores/mindMapStore";
-import MindMapNode from "~/components/canvas/MindMapNode.vue";
-import SearchCard from "~/components/SearchCard.vue";
 
-// Define node types for Vue Flow
-const nodeTypes = {
-  custom: MindMapNode,
+// Components
+import Header from "~/components/Header.vue";
+import SearchCard from "~/components/SearchCard.vue";
+import MindMapNode from "~/components/canvas/MindMapNode.vue";
+
+// Store
+import { useMindMapStore } from "~/stores/mindMapStore";
+
+// Composable
+const router = useRouter();
+const user = useSupabaseUser();
+const mindMapStore = useMindMapStore();
+
+// Reactive state
+const searchQuery = ref("");
+const searchResults = ref([]);
+const flowContainerRef = ref(null);
+
+const modelNodes = ref([]);
+const modelEdges = ref([]);
+
+const { fitView, viewportInitialized } = useVueFlow();
+
+const flowReady = ref(false);
+const onFlowInit = () => {
+  flowReady.value = true;
+  // wait next tick to ensure DOM nodes are measured
+  nextTick(() => {
+    try {
+      fitView({ padding: 0.2 });
+    } catch (e) {
+      /* ignore */
+    }
+  });
 };
 
-// Initialize store
-const store = useMindMapStore();
-const elements = computed(() => store.visibleElements);
+watch(
+  modelNodes,
+  async () => {
+    await nextTick();
+    if (!flowReady.value || !viewportInitialized?.value) return;
+    try {
+      fitView({ padding: 0.2 });
+    } catch (e) {
+      /* ignore */
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  () => mindMapStore.flowNodes,
+  (val) => {
+    // Always replace array reference so VueFlow receives updates
+    modelNodes.value = Array.isArray(val) ? [...val] : [];
+  },
+  { immediate: true }
+);
+
+watch(
+  () => mindMapStore.flowEdges,
+  (val) => {
+    modelEdges.value = Array.isArray(val) ? [...val] : [];
+  },
+  { immediate: true }
+);
+
+// Computed properties
+
+const nodeTypes = {
+  custom: markRaw(MindMapNode),
+};
+
+// Handle node click (supports both (event, node) and (node) signatures)
+const onNodeClick = (arg1, arg2) => {
+  const node = arg2 && arg2.id ? arg2 : arg1 && arg1.id ? arg1 : null;
+  if (!node || !node.data) return;
+
+  // Use data.level semantics; fallback to old data.type if present
+  const level = node.data.level ?? node.data.type ?? null;
+  const isRoot = !!node.data.isRoot;
+
+  // Toggle expand/collapse when root or when node has children
+  if (isRoot || (node.data.children && node.data.children.length)) {
+    try {
+      mindMapStore.toggleNode(node.id);
+    } catch (e) {
+      console.warn("onNodeClick toggle failed:", e);
+    }
+  }
+};
+
+// Handle pane click (background click)
+const onPaneClick = () => {
+  searchResults.value = [];
+};
 
 // Search functionality
-interface SearchResult {
-  id: string;
-  label: string;
-}
-
-const searchQuery = ref("");
-const searchResults = ref<SearchResult[]>([]);
-
-// Handle search input
 const handleSearch = () => {
   if (!searchQuery.value.trim()) {
     searchResults.value = [];
@@ -111,10 +194,10 @@ const handleSearch = () => {
   }
 
   const query = searchQuery.value.toLowerCase();
-  const results: SearchResult[] = [];
+  const results = [];
 
   // Simple search implementation
-  const searchNodes = (nodes: any[]) => {
+  const searchNodes = (nodes) => {
     nodes.forEach((node) => {
       if (node.data?.label?.toLowerCase().includes(query)) {
         results.push({ id: node.id, label: node.data.label });
@@ -125,35 +208,23 @@ const handleSearch = () => {
     });
   };
 
-  searchNodes(store.nodes);
+  searchNodes(mindMapStore.nodes);
   searchResults.value = results;
 };
 
-// Handle node click
-const onNodeClick = (_event: Event, node: any) => {
-  console.log("Node clicked:", node);
-};
-
-// Handle pane click (background click)
-const onPaneClick = () => {
-  searchResults.value = [];
-};
-
 // Handle search result selection
-const selectSearchResult = (result: SearchResult) => {
-  console.log("Selected result:", result);
+const selectSearchResult = (result) => {
+  // TODO: Implement search result selection
   searchQuery.value = "";
   searchResults.value = [];
 };
 
-// User authentication
-const user = useSupabaseUser();
-const router = useRouter();
-
 // Redirect to login if not authenticated
-if (process.client && !user.value) {
-  await router.push("/login");
-}
+onMounted(() => {
+  if (process.client && !user.value) {
+    router.push("/login");
+  }
+});
 </script>
 
 <style scoped>
@@ -183,7 +254,7 @@ if (process.client && !user.value) {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-:deep(.vue-flow) {
-  background-color: #0d0d12;
+:deep(.vue-flow__edge-path) {
+  pointer-events: none;
 }
 </style>

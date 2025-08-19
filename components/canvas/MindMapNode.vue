@@ -1,65 +1,248 @@
 <template>
-  <div class="mind-map-node bg-[#2C2B30] border border-[#47464B] rounded-lg p-3 text-white flex items-center shadow-lg">
-    <Handle type="target" :position="Position.Left" />
-    <span class="flex-grow text-center px-2">{{ data.label }}</span>
-    <button 
-      v-if="hasChildren" 
-      @click="toggle" 
-      class="w-6 h-6 border border-white rounded flex items-center justify-center text-lg font-bold ml-2 hover:bg-white/10 transition-colors"
-      :class="{ 'bg-white/10': isExpanded }"
+  <div
+    class="group relative w-auto select-none"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+    tabindex="0"
+  >
+    <Handle
+      type="source"
+      :position="Position.Right"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <Handle
+      type="target"
+      :position="Position.Left"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <!-- ROOT: sempre card -->
+    <div
+      v-if="data.isRoot"
+      class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
+      :class="{
+        'border-blue-500 border-2': selected,
+        'hover:border-blue-400': !selected,
+      }"
     >
-      {{ isExpanded ? '-' : '+' }}
-    </button>
-    <Handle type="source" :position="Position.Right" />
+      <!-- Input connection point (left) -->
+      <div
+        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
+      />
+
+      <!-- Node content -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center mb-1">
+          <div class="mr-2 flex items-center" v-if="data.iconName">
+            <component :is="ICONS[data.iconName]" v-if="ICONS[data.iconName]" />
+          </div>
+          <div class="font-semibold text-sm flex-grow text-white">
+            {{ data.label || label }}
+          </div>
+        </div>
+        <div class="text-xs opacity-90 mt-1" v-if="data.description">
+          {{ data.description }}
+        </div>
+      </div>
+
+      <!-- Output connection point (right) -->
+      <div
+        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
+      />
+    </div>
+
+    <!-- External connector + button (root) -->
+    <div
+      v-if="hasChildren && data.isRoot"
+      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10"
+    >
+      <!-- connector line (fixed, ends before the button) -->
+      <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+      <!-- outlined circle button drawing +/- with CSS -->
+      <button
+        @click.stop="toggle"
+        aria-label="Expandir/contrair"
+        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+        :class="{
+          // show vertical bar only when collapsed (plus)
+          'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+            !isExpanded,
+        }"
+      />
+    </div>
+
+    <!-- NÃO-ROOT: lightweight por padrão, card no hover/focus -->
+    <div v-else class="w-64">
+      <!-- Lightweight (texto simples) -->
+      <span
+        class="block text-sm text-white leading-snug truncate group-hover:hidden group-focus-visible:hidden"
+      >
+        {{ data.label || label }}
+      </span>
+
+      <!-- Card no hover/focus -->
+      <div
+        class="hidden group-hover:flex group-focus-visible:flex p-3 rounded-lg bg-[#1d1d1f] border border-gray-800 shadow-lg transition-all duration-200 items-start gap-2"
+        :class="{
+          'border-blue-500 border-2': selected,
+          'hover:border-blue-400': !selected,
+        }"
+      >
+        <!-- Input connection point (left) -->
+        <div
+          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
+        />
+
+        <!-- Node content -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center mb-1">
+            <div class="mr-2 flex items-center" v-if="data.iconName">
+              <component
+                :is="ICONS[data.iconName]"
+                v-if="ICONS[data.iconName]"
+              />
+            </div>
+            <div class="font-semibold text-lg flex-grow text-white">
+              {{ data.label || label }}
+            </div>
+          </div>
+          <div class="text-xs opacity-90 mt-1" v-if="data.description">
+            {{ data.description }}
+          </div>
+          <div class="mt-2 flex gap-2">
+            <button
+              v-if="data.onPrimary"
+              class="rounded-md bg-white/10 px-2 py-1 text-xs hover:bg-white/20 text-white"
+              @click.stop="data.onPrimary?.()"
+            >
+              Pesquisar categoria
+            </button>
+          </div>
+        </div>
+
+        <!-- Output connection point (right) -->
+        <div
+          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
+        />
+      </div>
+
+      <!-- External connector + button (non-root, shows on hover) -->
+      <div
+        v-if="hasChildren && !data.isRoot"
+        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
+      >
+        <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+        <button
+          @click.stop="toggle"
+          aria-label="Expandir/contrair"
+          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
+          :class="{
+            'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+              !isExpanded,
+          }"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Handle, Position } from '@vue-flow/core';
-import { useMindMapStore } from '~/stores/mindMapStore';
+// Auto-imported in Nuxt 3: ref, computed, nextTick, defineAsyncComponent
+import HeartIcon from "~/components/icon/HeartIcon.vue";
 
-interface NodeProps {
-  id: string;
+// Use Vue Flow and store
+const { useVueFlow } = await import("@vue-flow/core");
+const { useMindMapStore } = await import("~/stores/mindMapStore");
+const { Handle, Position } = await import("@vue-flow/core");
+
+const isHovered = ref(false);
+const store = useMindMapStore();
+const { updateNodeInternals } = useVueFlow();
+
+// Non-reactive icon registry
+const ICONS: Record<string, any> = {
+  heart: HeartIcon,
+};
+
+// Component props
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
   data: {
-    label: string;
-    children?: any[];
-    isExpanded?: boolean;
-  };
-  type: string;
-  selected?: boolean;
-  isConnectable?: boolean;
-  xPos: number;
-  yPos: number;
-  dragging?: boolean;
-  targetPosition?: string;
-  sourcePosition?: string;
-}
-
-const props = withDefaults(defineProps<NodeProps>(), {
-  selected: false,
-  isConnectable: true,
-  dragging: false,
-  targetPosition: 'top',
-  sourcePosition: 'bottom'
+    type: Object,
+    required: true,
+    default: () => ({
+      isRoot: false,
+      isExpanded: false,
+      children: [],
+    }),
+  },
+  label: {
+    type: String,
+    default: "",
+  },
+  type: {
+    type: String,
+    default: "default",
+  },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
+  isConnectable: {
+    type: Boolean,
+    default: true,
+  },
+  position: {
+    type: Object,
+    required: true,
+    default: () => ({ x: 0, y: 0 }),
+  },
+  // Vue Flow connection points
+  sourcePosition: {
+    type: String,
+    default: "right",
+  },
+  targetPosition: {
+    type: String,
+    default: "left",
+  },
 });
 
-const store = useMindMapStore();
+// Computed properties
+const hasChildren = computed(() => {
+  return props.data?.children?.length > 0;
+});
 
-const hasChildren = computed(() => props.data.children && props.data.children.length > 0);
-const isExpanded = computed(() => props.data.isExpanded);
+const isExpanded = computed(() => {
+  return !!props.data?.isExpanded;
+});
 
-function toggle() {
+// Toggle node expansion
+const toggle = () => {
   store.toggleNode(props.id);
-}
+  // Force Vue Flow to recalculate after state change on the next frame
+  if (typeof window !== "undefined") {
+    requestAnimationFrame(() => {
+      updateNodeInternals();
+    });
+  }
+};
+
+// Expose connection points for Vue Flow
+const connectionPoints = {
+  source: "right",
+  target: "left",
+};
+
+defineExpose({
+  connectionPoints,
+});
 </script>
 
 <style scoped>
-.mind-map-node {
-  min-width: 180px;
-  transition: all 0.2s ease;
-}
-
-.mind-map-node:hover {
-  box-shadow: 0 0 0 1px #3b82f6;
+.vue-flow__edge-path {
+  pointer-events: none;
 }
 </style>
