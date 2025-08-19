@@ -14,7 +14,6 @@ export interface MindMapNode extends Node {
   data: {
     label: string;
     level: NodeLevel;
-    isRoot?: boolean;
     iconName?: string;
     children?: MindMapNode[];
     isExpanded?: boolean;
@@ -30,7 +29,6 @@ const initialNodes: MindMapNode[] = [
     data: {
       label: "Saúde",
       level: "CoreMarket",
-      isRoot: true,
       iconName: "heart",
       isExpanded: false,
       children: [
@@ -40,7 +38,6 @@ const initialNodes: MindMapNode[] = [
           data: {
             label: "Nutrição e dieta",
             level: "Category",
-            isRoot: false,
             isExpanded: false,
             edgeLabel: "Nutrição e dieta",
             children: [
@@ -155,7 +152,6 @@ const initialNodes: MindMapNode[] = [
           data: {
             label: "Bem estar mental",
             level: "Category",
-            isRoot: false,
             isExpanded: false,
             edgeLabel: "Bem estar mental",
             children: [],
@@ -168,7 +164,6 @@ const initialNodes: MindMapNode[] = [
           data: {
             label: "Fitness e atividade física",
             level: "Category",
-            isRoot: false,
             isExpanded: false,
             edgeLabel: "Fitness e atividade física",
             children: [],
@@ -185,7 +180,6 @@ const initialNodes: MindMapNode[] = [
     data: {
       label: "Prosperidade",
       level: "CoreMarket",
-      isRoot: true,
       isExpanded: false,
       children: [],
     },
@@ -197,7 +191,6 @@ const initialNodes: MindMapNode[] = [
     data: {
       label: "Relacionamentos",
       level: "CoreMarket",
-      isRoot: true,
       isExpanded: false,
       children: [],
     },

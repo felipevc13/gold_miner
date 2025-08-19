@@ -17,7 +17,7 @@
     />
     <!-- ROOT: sempre card -->
     <div
-      v-if="data.isRoot"
+      v-if="data.level === 'CoreMarket'"
       class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
       :class="{
         'border-blue-500 border-2': selected,
@@ -52,7 +52,7 @@
 
     <!-- External connector + button (root) -->
     <div
-      v-if="hasChildren && data.isRoot"
+      v-if="hasChildren && data.level === 'CoreMarket'"
       class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10"
     >
       <!-- connector line (fixed, ends before the button) -->
@@ -71,7 +71,7 @@
     </div>
 
     <!-- NÃO-ROOT: lightweight por padrão, card no hover/focus -->
-    <div v-else class="w-64">
+    <div v-if="data.level !== 'CoreMarket'" class="w-64">
       <!-- Lightweight (texto simples) -->
       <span
         class="block text-sm text-white leading-snug truncate group-hover:hidden group-focus-visible:hidden"
@@ -127,7 +127,7 @@
 
       <!-- External connector + button (non-root, shows on hover) -->
       <div
-        v-if="hasChildren && !data.isRoot"
+        v-if="hasChildren && data.level !== 'CoreMarket'"
         class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
       >
         <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
@@ -173,7 +173,7 @@ const props = defineProps({
     type: Object,
     required: true,
     default: () => ({
-      isRoot: false,
+      level: "Category",
       isExpanded: false,
       children: [],
     }),
