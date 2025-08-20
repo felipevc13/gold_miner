@@ -2,7 +2,7 @@
   <!-- Card overlay for non-root nodes -->
   <div
     ref="cardRef"
-    class="w-full h-full p-3 rounded-lg bg-[#1d1d1f] border-t border-t-[#47464B] shadow-lg transition-all duration-200 flex items-start gap-2 transform hover:scale-[1.02] hover:shadow-xl hover:z-20 relative group"
+    class="w-full h-full p-3 rounded-lg bg-[#1d1d1f] border-t border-t-[#47464B] shadow-lg transition-all duration-200 flex items-start gap-2 transform hover:shadow-xl hover:z-20 relative group"
     :data-node-id="nodeId"
     :data-visible="isVisible"
     style="
@@ -32,8 +32,10 @@
         class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-all hover:border-[#8E6CE4] group-hover:border-[#8E6CE4] flex items-center justify-center"
       >
         <div class="relative w-3 h-3">
-          <div class="absolute top-1/2 left-0 w-full h-[2px] bg-[#5A5A60] -translate-y-1/2 group-hover:bg-[#8E6CE4]"></div>
-          <div 
+          <div
+            class="absolute top-1/2 left-0 w-full h-[2px] bg-[#5A5A60] -translate-y-1/2 group-hover:bg-[#8E6CE4]"
+          ></div>
+          <div
             v-if="!isExpanded"
             class="absolute top-1/2 left-0 w-full h-[2px] bg-[#5A5A60] -translate-y-1/2 rotate-90 group-hover:bg-[#8E6CE4]"
           ></div>
@@ -98,11 +100,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Emit events
 const emit = defineEmits<{
-  (e: 'primary'): void;
-  (e: 'toggle'): void;
-  (e: 'mouseenter', event: MouseEvent): void;
-  (e: 'mouseleave', event: MouseEvent): void;
-}>()
+  (e: "primary"): void;
+  (e: "toggle"): void;
+  (e: "mouseenter", event: MouseEvent): void;
+  (e: "mouseleave", event: MouseEvent): void;
+}>();
 
 const cardRef = ref<HTMLElement | null>(null);
 

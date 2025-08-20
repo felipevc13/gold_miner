@@ -200,7 +200,7 @@ const initialNodes: MindMapNode[] = [
 
 export const useMindMapStore = defineStore("mindMap", {
   state: () => ({
-    activeNodeId: null as string | null,  // Track which node should show the overlay
+    activeNodeId: null as string | null, // Track which node should show the overlay
     nodes: initialNodes,
   }),
 
