@@ -47,7 +47,10 @@
               :label="data.label || label"
               :description="data.description"
               :selected="selected"
+              :has-children="hasChildren"
+              :is-expanded="isExpanded"
               @primary="data.onPrimary?.()"
+              @toggle="toggle"
             >
               <template #icon>
                 <component
@@ -59,35 +62,6 @@
           </div>
         </template>
       </BaseNodeShell>
-
-      <!-- External connector + button (non-root, shows on hover) -->
-      <div
-        v-if="hasChildren && data.level !== 'CoreMarket'"
-        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity group nodrag nowheel nopan"
-        @mousedown.stop
-        @pointerdown.stop
-        @wheel.stop.prevent
-        @touchstart.stop
-        @dblclick.stop.prevent
-      >
-        <div class="h-[2px] bg-[#5A5A60]"></div>
-        <button
-          type="button"
-          @mousedown.stop
-          @pointerdown.stop
-          @wheel.stop.prevent
-          @touchstart.stop
-          @click.stop="toggle"
-          @dblclick.stop.prevent
-          aria-label="Expandir/contrair"
-          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded hover:border-[#8E6CE4] hover:before:bg-[#8E6CE4] hover:after:bg-[#8E6CE4] nodrag nowheel nopan"
-          style="touch-action: manipulation"
-          :class="{
-            'after:content-[\'\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
-              !isExpanded,
-          }"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -99,7 +73,7 @@ const nextTick = () => new Promise((resolve) => setTimeout(resolve, 0));
 import LightweightText from "~/components/canvas/node/LightweightText.vue";
 import BaseNodeShell from "~/components/canvas/base/BaseNodeShell.vue";
 import CardOverlay from "~/components/canvas/node/CardOverlay.vue";
-import CoreMarketNode from './node/CoreMarketNode.vue';
+import CoreMarketNode from "./node/CoreMarketNode.vue";
 
 // Use Vue Flow and store
 const { useVueFlow } = await import("@vue-flow/core");
