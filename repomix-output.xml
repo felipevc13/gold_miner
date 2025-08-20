@@ -47,6 +47,11 @@ assets/
     tailwind.css
 components/
   canvas/
+    base/
+      BaseNodeShell.vue
+    node/
+      CardOverlay.vue
+      LightweightText.vue
     MindMapNode.vue
   icon/
     CloseIcon.vue
@@ -87,6 +92,7 @@ types/
   imports.d.ts
   nuxt-app.d.ts
   nuxt-config.d.ts
+  nuxt-tailwindcss.d.ts
   nuxt.d.ts
   supabase.d.ts
   supabase.ts
@@ -101,12 +107,344 @@ nuxt.tsconfig.json
 package.json
 README.md
 tailwind.config.js
-tsconfig.app.json
 tsconfig.json
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="components/canvas/base/BaseNodeShell.vue">
+<template>
+  <!-- Base shell with fixed size and slots for content and overlay -->
+  <div
+    class="relative"
+    :style="{
+      width: width + 'px',
+      height: height + 'px',
+      contain: 'layout style',
+    }"
+    v-bind="$attrs"
+    :data-debug-overlay="showOverlay ? 'visible' : 'hidden'"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
+  >
+    <!-- Base content (lightweight). Maintains footprint, centered. -->
+    <div
+      class="absolute inset-0 flex items-center justify-center transition-opacity duration-200"
+      :class="showOverlay ? 'opacity-0' : 'opacity-100'"
+      style="pointer-events: none"
+    >
+      <slot />
+    </div>
+
+    <!-- Overlay for the card, controlled externally. Doesn't change node size. -->
+    <transition
+      name="fade"
+      mode="out-in"
+      @before-enter="onBeforeEnter"
+      @enter="onEnter"
+      @after-enter="onAfterEnter"
+      @before-leave="onBeforeLeave"
+      @leave="onLeave"
+      @after-leave="onAfterLeave"
+    >
+      <div
+        v-if="showOverlay"
+        class="absolute inset-0 z-10 transition-opacity duration-200"
+        style="transform: translateZ(0); pointer-events: auto"
+        @click="handleOverlayClick"
+      >
+        <div
+          v-if="!slots.overlay"
+          class="w-full h-full flex items-center justify-center bg-red-500/10"
+        >
+          <div class="text-xs text-red-500 p-2 bg-white/90 rounded">
+            No overlay slot content provided
+          </div>
+        </div>
+        <slot v-else name="overlay" />
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup lang="ts">
+import * as Vue from "vue";
+const onMouseEnter = () => {
+  console.log("BaseNodeShell - mouseenter", {
+    showOverlay: props.showOverlay,
+    timestamp: new Date().toISOString(),
+  });
+};
+const onMouseLeave = () => {
+  console.log("BaseNodeShell - mouseleave", {
+    showOverlay: props.showOverlay,
+    timestamp: new Date().toISOString(),
+  });
+};
+const onBeforeEnter = () =>
+  console.log("Overlay - before enter", {
+    timestamp: new Date().toISOString(),
+  });
+const onEnter = () =>
+  console.log("Overlay - enter", { timestamp: new Date().toISOString() });
+const onAfterEnter = () =>
+  console.log("Overlay - after enter", { timestamp: new Date().toISOString() });
+const onBeforeLeave = () =>
+  console.log("Overlay - before leave", {
+    timestamp: new Date().toISOString(),
+  });
+const onLeave = () =>
+  console.log("Overlay - leave", { timestamp: new Date().toISOString() });
+const onAfterLeave = () =>
+  console.log("Overlay - after leave", { timestamp: new Date().toISOString() });
+const handleOverlayClick = (e: MouseEvent) => {
+  console.log("Overlay - click", {
+    target: e.target,
+    currentTarget: e.currentTarget,
+    hasOverlaySlot: !!slots.overlay,
+    timestamp: new Date().toISOString(),
+  });
+  e.stopPropagation();
+};
+
+// Component props with TypeScript interface
+interface Props {
+  width: number;
+  height: number;
+  showOverlay: boolean;
+  debug?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  debug: false,
+});
+
+const slots = Vue.useSlots();
+
+/**
+ * BaseNodeShell
+ * - Garante footprint fixo do nó no canvas.
+ * - Usa slots: padrão (conteúdo lightweight) e `overlay` (card absoluto).
+ * - Não aplica estilos visuais (cor/borda/sombra) — só tamanho e posicionamento.
+ */
+
+// Log component lifecycle and props changes
+const logState = (context: string): void => {
+  if (!props.debug) return;
+
+  console.log(`[BaseNodeShell] ${context}:`, {
+    width: props.width,
+    height: props.height,
+    showOverlay: props.showOverlay,
+    hasDefaultSlot: !!slots?.default,
+    hasOverlaySlot: !!slots?.overlay,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// Component lifecycle hooks
+Vue.onMounted(() => logState("Mounted"));
+Vue.onUpdated(() => logState("Updated"));
+
+// Watch for showOverlay changes
+Vue.watch(
+  () => props.showOverlay,
+  (newVal: boolean, oldVal: boolean) => {
+    if (!props.debug) return;
+
+    console.log("[BaseNodeShell] showOverlay changed:", {
+      from: oldVal,
+      to: newVal,
+      timestamp: new Date().toISOString(),
+    });
+  },
+  { immediate: true, flush: "post" }
+);
+</script>
+</file>
+
+<file path="components/canvas/node/CardOverlay.vue">
+<template>
+  <!-- Card overlay for non-root nodes -->
+  <div
+    ref="cardRef"
+    class="w-full h-full p-3 rounded-lg bg-[#1d1d1f] border-t border-t-[#47464B] shadow-lg transition-all duration-200 flex items-start gap-2 transform hover:scale-[1.02] hover:shadow-xl hover:z-20"
+    :data-node-id="nodeId"
+    :data-visible="isVisible"
+    style="backface-visibility: hidden; transform-style: preserve-3d; will-change: transform, box-shadow; pointer-events: auto;"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
+  >
+    <!-- Ícone opcional -->
+    <div class="mt-0.5" v-if="$slots.icon">
+      <slot name="icon" />
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="flex-1 min-w-0">
+      <div class="font-semibold text-lg text-white truncate">
+        {{ label }}
+      </div>
+      <div v-if="description" class="text-xs text-white/80 mt-1 line-clamp-3">
+        {{ description }}
+      </div>
+
+      <!-- Slot extra opcional (tags, métricas, etc.) -->
+      <div v-if="$slots.default" class="mt-2">
+        <slot />
+      </div>
+
+      <!-- Ações -->
+      <div class="mt-3 flex gap-2">
+        <slot name="actions">
+          <UiButton v-if="ctaText" @click.stop="onPrimary()">
+            {{ ctaText }}
+          </UiButton>
+        </slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Explicitly import Vue Composition API functions
+import { useSlots, onMounted, watch, ref } from 'vue';
+import type { Ref } from 'vue';
+
+// Component props with TypeScript interface
+interface Props {
+  label: string;
+  description?: string;
+  ctaText?: string;
+  nodeId?: string;
+  isVisible?: boolean;
+  selected?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  description: '',
+  ctaText: 'Pesquisar categoria',
+  nodeId: '',
+  isVisible: false,
+  selected: false
+});
+
+const emit = defineEmits<{ (e: 'primary'): void }>();
+const slots = useSlots();
+const cardRef: Ref<HTMLElement | null> = ref(null);
+
+// Debug logging
+onMounted(() => {
+  console.log(`[CardOverlay] Mounted for node: ${props.nodeId}`, {
+    label: props.label,
+    isVisible: props.isVisible,
+    hasIcon: !!slots.icon,
+    hasDefaultSlot: !!slots.default,
+    hasActionsSlot: !!slots.actions,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Watch for visibility changes
+watch(() => props.isVisible, (newVal: boolean) => {
+  console.log(`[CardOverlay] Visibility changed: ${newVal}`, {
+    nodeId: props.nodeId,
+    label: props.label,
+    timestamp: new Date().toISOString()
+  });
+});
+
+function onMouseEnter(event: MouseEvent) {
+  console.log('[CardOverlay] Mouse enter:', {
+    nodeId: props.nodeId,
+    label: props.label,
+    target: event.target,
+    currentTarget: event.currentTarget,
+    timestamp: new Date().toISOString()
+  });
+}
+
+function onMouseLeave(event: MouseEvent) {
+  console.log('[CardOverlay] Mouse leave:', {
+    nodeId: props.nodeId,
+    label: props.label,
+    target: event.target,
+    currentTarget: event.currentTarget,
+    timestamp: new Date().toISOString()
+  });
+}
+
+function onPrimary() {
+  console.log('[CardOverlay] Primary action triggered:', {
+    nodeId: props.nodeId,
+    label: props.label,
+    timestamp: new Date().toISOString()
+  });
+  emit('primary');
+}
+</script>
+</file>
+
+<file path="components/canvas/node/LightweightText.vue">
+<template>
+  <!-- Conteúdo lightweight SEM casco: deve ser usado DENTRO do BaseNodeShell -->
+  <div
+    class="w-full h-full flex items-center justify-center px-3"
+    :class="{ 'pr-8': reserveRight }"
+  >
+    <span
+      class="block text-sm leading-none truncate"
+      :class="textClass"
+      :title="label"
+    >
+      {{ label }}
+    </span>
+  </div>
+</template>
+
+<script setup lang="ts">
+/**
+ * LightweightText
+ * - Apenas o conteúdo visual do estado "leve".
+ * - Deve ser renderizado DENTRO do BaseNodeShell (no slot padrão).
+ * - `reserveRight` deixa espaço à direita para o botão externo (+/-) quando existir.
+ */
+const props = withDefaults(
+  defineProps<{
+    label: string;
+    /** Classe extra para o texto (ex.: 'text-white/90') */
+    textClass?: string;
+    /** Reserva espaço à direita para o conector externo */
+    reserveRight?: boolean;
+  }>(),
+  {
+    textClass: "text-white",
+    reserveRight: false,
+  }
+);
+
+const { label, textClass, reserveRight } = props;
+</script>
+</file>
+
+<file path="types/nuxt-tailwindcss.d.ts">
+// nuxt-app/types/nuxt-tailwindcss.d.ts
+declare module "nuxt/schema" {
+  interface NuxtConfig {
+    tailwindcss?: {
+      viewer?: boolean;
+      cssPath?: string | false;
+      configPath?: string;
+      exposeConfig?: boolean;
+      editorSupport?: boolean;
+      // permite chaves extras do módulo
+    } & Record<string, any>;
+  }
+  interface NuxtOptions extends NuxtConfig {}
+}
+export {};
+</file>
 
 <file path="app/app.vue">
 <template>
@@ -574,207 +912,6 @@ defineEmits<{
   (e: "click", event: MouseEvent): void;
 }>();
 </script>
-</file>
-
-<file path="composables/useMindMapLayout.ts">
-import type { Node, Edge, XYPosition } from "@vue-flow/core";
-
-// Semantic levels supported when present in node.data.level
-export type NodeLevel =
-  | "CoreMarket"
-  | "Category"
-  | "Subcategory"
-  | "Niche"
-  | "SubNiche";
-
-const LEVEL_ORDER: Record<NodeLevel, number> = {
-  CoreMarket: 0,
-  Category: 1,
-  Subcategory: 2,
-  Niche: 3,
-  SubNiche: 4,
-};
-
-type LayoutOpts = {
-  rootId: string;
-  /** Base horizontal distance between columns (used if no levelGaps provided) */
-  levelGap?: number;
-  /** Base vertical distance between siblings (used if no rowGaps provided) */
-  rowGap?: number;
-  /** Where to place the root */
-  center?: XYPosition;
-  /** Optional per-column horizontal gaps; index == column */
-  levelGaps?: number[];
-  /** Optional per-column vertical gaps; index == column */
-  rowGaps?: number[];
-};
-
-export function layoutMindMap(
-  nodes: Node[],
-  edges: Edge[],
-  opts: LayoutOpts
-): Node[] {
-  const baseLevelGap = opts.levelGap ?? 280;
-  const baseRowGap = opts.rowGap ?? 100;
-  const center = opts.center ?? { x: 200, y: 200 };
-  const levelGaps = opts.levelGaps ?? [];
-  const rowGaps = opts.rowGaps ?? [];
-
-  const getLevelGap = (col: number) => levelGaps[col] ?? baseLevelGap;
-  const getRowGap = (col: number) => rowGaps[col] ?? baseRowGap;
-
-  // Quick indices
-  const nodeById = new Map<string, Node>();
-  nodes.forEach((n) => nodeById.set(n.id, n));
-
-  const children = new Map<string, string[]>();
-  const parentOf = new Map<string, string>();
-  edges.forEach((e) => {
-    if (!children.has(e.source)) children.set(e.source, []);
-    children.get(e.source)!.push(e.target);
-    parentOf.set(e.target, e.source);
-  });
-
-  // BFS fallback levels starting at root
-  const bfsLevel = new Map<string, number>();
-  const q: Array<[string, number]> = [[opts.rootId, 0]];
-  const seen = new Set<string>();
-  while (q.length) {
-    const [id, lvl] = q.shift()!;
-    if (seen.has(id)) continue;
-    seen.add(id);
-    bfsLevel.set(id, lvl);
-    const kids = children.get(id) ?? [];
-    for (const kid of kids) q.push([kid, lvl + 1]);
-  }
-
-  // Column by semantic level when available, otherwise BFS
-  const colOf = (id: string): number => {
-    const n = nodeById.get(id);
-    const lvlName = (n?.data as any)?.level as NodeLevel | undefined;
-    if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
-    return bfsLevel.get(id) ?? 0;
-  };
-
-  // Precompute cumulative X offsets per column
-  const maxCol = Math.max(
-    0,
-    ...nodes.map((n) => {
-      const lvlName = (n.data as any)?.level as NodeLevel | undefined;
-      if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
-      return bfsLevel.get(n.id) ?? 0;
-    })
-  );
-  const colOffsetX: number[] = new Array(maxCol + 1).fill(0);
-  for (let c = 1; c <= maxCol; c++) {
-    colOffsetX[c] = colOffsetX[c - 1] + getLevelGap(c - 1);
-  }
-
-  // Position map we will fill
-  const positioned = new Map<string, XYPosition>();
-
-  // Place root so its visual center aligns to `center.y`
-  const rootNode = nodeById.get(opts.rootId) as any;
-  const rootLevel: string | undefined = rootNode?.data?.level;
-  const fallbackRootH = rootLevel === "CoreMarket" ? 88 : 24;
-  const rootH: number = rootNode?.dimensions?.height ?? fallbackRootH;
-  positioned.set(opts.rootId, { x: center.x, y: center.y - rootH / 2 });
-
-  // Walk columns from 1..max, group children by parent and stack around parent.y
-  for (let c = 1; c <= maxCol; c++) {
-    // collect all nodes that belong to column c
-    const idsAtCol = nodes.map((n) => n.id).filter((id) => colOf(id) === c);
-
-    if (!idsAtCol.length) continue;
-
-    // group by parent to keep siblings together
-    const groups = new Map<string, string[]>();
-    for (const id of idsAtCol) {
-      const p = parentOf.get(id);
-      if (!p) continue;
-      if (!groups.has(p)) groups.set(p, []);
-      groups.get(p)!.push(id);
-    }
-
-    // position each group near its parent
-    for (const [parentId, group] of groups) {
-      // parent might not be in same column; ensure we have its position
-      const pPos = positioned.get(parentId) ?? {
-        x: center.x + colOffsetX[colOf(parentId)],
-        y: center.y,
-      };
-      positioned.set(parentId, pPos);
-
-      const x = center.x + colOffsetX[c];
-      const gapY = getRowGap(c);
-      const total = (group.length - 1) * gapY;
-
-      // Parent visual midline
-      const parentNode = nodeById.get(parentId) as any;
-      const parentLevel: string | undefined = parentNode?.data?.level;
-      // Fallback heights by level to approximate visual center when dimensions are not yet available
-      const fallbackParentH =
-        parentLevel === "CoreMarket"
-          ? 88
-          : /* Category / Subcategory / Niche / SubNiche (lightweight text) */ 24;
-
-      const parentH: number = parentNode?.dimensions?.height ?? fallbackParentH;
-      const parentCenterY = pPos.y + parentH / 2;
-
-      // Provisional positions using tops spaced by gapY and a generic child height
-      const firstChild = nodeById.get(group[0]) as any;
-      const approxChildH: number = firstChild?.dimensions?.height ?? 24;
-      const startY = parentCenterY - total / 2 - approxChildH / 2;
-
-      // Stage provisional positions in an array to compute visual bbox
-      const provisional = group.map((id, idx) => ({
-        id,
-        x,
-        y: startY + idx * gapY,
-      }));
-
-      // Compute group visual bbox using measured heights when available
-      let minY = Number.POSITIVE_INFINITY;
-      let maxY = Number.NEGATIVE_INFINITY;
-      const heights = new Map<string, number>();
-      for (const { id, y } of provisional) {
-        const child = nodeById.get(id) as any;
-        const h = child?.dimensions?.height ?? approxChildH;
-        heights.set(id, h);
-        minY = Math.min(minY, y);
-        maxY = Math.max(maxY, y + h);
-      }
-
-      // Center group bbox midline to parent's center
-      const groupCenterY = (minY + maxY) / 2;
-      const deltaY = parentCenterY - groupCenterY;
-
-      // Persist final positions (shifted by deltaY)
-      for (const { id, x, y } of provisional) {
-        const finalY = y + deltaY;
-        positioned.set(id, { x, y: finalY });
-      }
-    }
-  }
-
-  // Ensure any nodes without parents (or ungrouped) still get a position by their column, stacking progressively
-  const fallbackCountPerCol = new Map<number, number>();
-  for (const n of nodes) {
-    if (positioned.has(n.id)) continue;
-    const c = colOf(n.id);
-    const x = center.x + colOffsetX[c];
-    const i = fallbackCountPerCol.get(c) ?? 0;
-    const y = center.y + (i - 0.5) * getRowGap(c);
-    fallbackCountPerCol.set(c, i + 1);
-    positioned.set(n.id, { x, y });
-  }
-
-  // Return nodes with position applied
-  return nodes.map((n) => {
-    const p = positioned.get(n.id);
-    return p ? { ...n, position: p, draggable: false } : n;
-  });
-}
 </file>
 
 <file path="layouts/blank.vue">
@@ -1445,6 +1582,207 @@ watch(() => props.modelValue, (newValue: string) => {
 </script>
 </file>
 
+<file path="composables/useMindMapLayout.ts">
+import type { Node, Edge, XYPosition } from "@vue-flow/core";
+
+// Semantic levels supported when present in node.data.level
+export type NodeLevel =
+  | "CoreMarket"
+  | "Category"
+  | "Subcategory"
+  | "Niche"
+  | "SubNiche";
+
+const LEVEL_ORDER: Record<NodeLevel, number> = {
+  CoreMarket: 0,
+  Category: 1,
+  Subcategory: 2,
+  Niche: 3,
+  SubNiche: 4,
+};
+
+type LayoutOpts = {
+  rootId: string;
+  /** Base horizontal distance between columns (used if no levelGaps provided) */
+  levelGap?: number;
+  /** Base vertical distance between siblings (used if no rowGaps provided) */
+  rowGap?: number;
+  /** Where to place the root */
+  center?: XYPosition;
+  /** Optional per-column horizontal gaps; index == column */
+  levelGaps?: number[];
+  /** Optional per-column vertical gaps; index == column */
+  rowGaps?: number[];
+};
+
+export function layoutMindMap(
+  nodes: Node[],
+  edges: Edge[],
+  opts: LayoutOpts
+): Node[] {
+  const baseLevelGap = opts.levelGap ?? 280;
+  const baseRowGap = opts.rowGap ?? 100;
+  const center = opts.center ?? { x: 200, y: 200 };
+  const levelGaps = opts.levelGaps ?? [];
+  const rowGaps = opts.rowGaps ?? [];
+
+  const getLevelGap = (col: number) => levelGaps[col] ?? baseLevelGap;
+  const getRowGap = (col: number) => rowGaps[col] ?? baseRowGap;
+
+  // Quick indices
+  const nodeById = new Map<string, Node>();
+  nodes.forEach((n) => nodeById.set(n.id, n));
+
+  const children = new Map<string, string[]>();
+  const parentOf = new Map<string, string>();
+  edges.forEach((e) => {
+    if (!children.has(e.source)) children.set(e.source, []);
+    children.get(e.source)!.push(e.target);
+    parentOf.set(e.target, e.source);
+  });
+
+  // BFS fallback levels starting at root
+  const bfsLevel = new Map<string, number>();
+  const q: Array<[string, number]> = [[opts.rootId, 0]];
+  const seen = new Set<string>();
+  while (q.length) {
+    const [id, lvl] = q.shift()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    bfsLevel.set(id, lvl);
+    const kids = children.get(id) ?? [];
+    for (const kid of kids) q.push([kid, lvl + 1]);
+  }
+
+  // Column by semantic level when available, otherwise BFS
+  const colOf = (id: string): number => {
+    const n = nodeById.get(id);
+    const lvlName = (n?.data as any)?.level as NodeLevel | undefined;
+    if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
+    return bfsLevel.get(id) ?? 0;
+  };
+
+  // Precompute cumulative X offsets per column
+  const maxCol = Math.max(
+    0,
+    ...nodes.map((n) => {
+      const lvlName = (n.data as any)?.level as NodeLevel | undefined;
+      if (lvlName && lvlName in LEVEL_ORDER) return LEVEL_ORDER[lvlName];
+      return bfsLevel.get(n.id) ?? 0;
+    })
+  );
+  const colOffsetX: number[] = new Array(maxCol + 1).fill(0);
+  for (let c = 1; c <= maxCol; c++) {
+    colOffsetX[c] = colOffsetX[c - 1] + getLevelGap(c - 1);
+  }
+
+  // Position map we will fill
+  const positioned = new Map<string, XYPosition>();
+
+  // Place root so its visual center aligns to `center.y`
+  const rootNode = nodeById.get(opts.rootId) as any;
+  const rootLevel: string | undefined = rootNode?.data?.level;
+  const fallbackRootH = rootLevel === "CoreMarket" ? 88 : 24;
+  const rootH: number = rootNode?.dimensions?.height ?? fallbackRootH;
+  positioned.set(opts.rootId, { x: center.x, y: center.y - rootH / 2 });
+
+  // Walk columns from 1..max, group children by parent and stack around parent.y
+  for (let c = 1; c <= maxCol; c++) {
+    // collect all nodes that belong to column c
+    const idsAtCol = nodes.map((n) => n.id).filter((id) => colOf(id) === c);
+
+    if (!idsAtCol.length) continue;
+
+    // group by parent to keep siblings together
+    const groups = new Map<string, string[]>();
+    for (const id of idsAtCol) {
+      const p = parentOf.get(id);
+      if (!p) continue;
+      if (!groups.has(p)) groups.set(p, []);
+      groups.get(p)!.push(id);
+    }
+
+    // position each group near its parent
+    for (const [parentId, group] of groups) {
+      // parent might not be in same column; ensure we have its position
+      const pPos = positioned.get(parentId) ?? {
+        x: center.x + colOffsetX[colOf(parentId)],
+        y: center.y,
+      };
+      positioned.set(parentId, pPos);
+
+      const x = center.x + colOffsetX[c];
+      const gapY = getRowGap(c);
+      const total = (group.length - 1) * gapY;
+
+      // Parent visual midline
+      const parentNode = nodeById.get(parentId) as any;
+      const parentLevel: string | undefined = parentNode?.data?.level;
+      // Fallback heights by level to approximate visual center when dimensions are not yet available
+      const fallbackParentH =
+        parentLevel === "CoreMarket"
+          ? 88
+          : /* Category / Subcategory / Niche / SubNiche (lightweight text) */ 24;
+
+      const parentH: number = parentNode?.dimensions?.height ?? fallbackParentH;
+      const parentCenterY = pPos.y + parentH / 2;
+
+      // Provisional positions using tops spaced by gapY and a generic child height
+      const firstChild = nodeById.get(group[0]) as any;
+      const approxChildH: number = firstChild?.dimensions?.height ?? 24;
+      const startY = parentCenterY - total / 2 - approxChildH / 2;
+
+      // Stage provisional positions in an array to compute visual bbox
+      const provisional = group.map((id, idx) => ({
+        id,
+        x,
+        y: startY + idx * gapY,
+      }));
+
+      // Compute group visual bbox using measured heights when available
+      let minY = Number.POSITIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      const heights = new Map<string, number>();
+      for (const { id, y } of provisional) {
+        const child = nodeById.get(id) as any;
+        const h = child?.dimensions?.height ?? approxChildH;
+        heights.set(id, h);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y + h);
+      }
+
+      // Center group bbox midline to parent's center
+      const groupCenterY = (minY + maxY) / 2;
+      const deltaY = parentCenterY - groupCenterY;
+
+      // Persist final positions (shifted by deltaY)
+      for (const { id, x, y } of provisional) {
+        const finalY = y + deltaY;
+        positioned.set(id, { x, y: finalY });
+      }
+    }
+  }
+
+  // Ensure any nodes without parents (or ungrouped) still get a position by their column, stacking progressively
+  const fallbackCountPerCol = new Map<number, number>();
+  for (const n of nodes) {
+    if (positioned.has(n.id)) continue;
+    const c = colOf(n.id);
+    const x = center.x + colOffsetX[c];
+    const i = fallbackCountPerCol.get(c) ?? 0;
+    const y = center.y + (i - 0.5) * getRowGap(c);
+    fallbackCountPerCol.set(c, i + 1);
+    positioned.set(n.id, { x, y });
+  }
+
+  // Return nodes with position applied
+  return nodes.map((n) => {
+    const p = positioned.get(n.id);
+    return p ? { ...n, position: p, draggable: false } : n;
+  });
+}
+</file>
+
 <file path="middleware/auth.global.ts">
 // Import directly from Nuxt 3 packages
 import { navigateTo, defineNuxtRouteMiddleware } from '#app';
@@ -1627,10 +1965,11 @@ export {}
 {
   // Extend from the Nuxt recommended tsconfig
   "extends": "./.nuxt/tsconfig.json",
-  
+
   // Compiler options
   "compilerOptions": {
     // Type checking
+    "types": ["vue", "vite/client", "nuxt/schema", "@pinia/nuxt"],
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -1646,7 +1985,7 @@ export {}
     "resolveJsonModule": true,
     "allowJs": true,
     "noEmit": true,
-    
+
     // Module resolution
     "baseUrl": ".",
     "moduleResolution": "bundler",
@@ -1656,16 +1995,14 @@ export {}
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    
+
     // Path aliases
     "paths": {
       "~/*": ["./*"],
-      "@/*": ["./*"],
-      "#imports": ["./.nuxt/imports.d.ts"],
-      "#components": ["./components"]
+      "@/*": ["./*"]
     }
   },
-  
+
   // Include these files for type checking
   "include": [
     ".nuxt/nuxt.d.ts",
@@ -1680,266 +2017,10 @@ export {}
     "types/**/*.d.ts",
     "types/**/*.ts"
   ],
-  
+
   // Exclude these files from type checking
-  "exclude": [
-    "node_modules",
-    ".nuxt",
-    ".output",
-    "dist"
-  ]
+  "exclude": ["node_modules", ".nuxt", ".output", "dist"]
 }
-</file>
-
-<file path="components/canvas/MindMapNode.vue">
-<template>
-  <div
-    class="group relative w-auto select-none"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
-    tabindex="0"
-  >
-    <Handle
-      type="source"
-      :position="Position.Right"
-      :style="{ opacity: 0, pointerEvents: 'none' }"
-    />
-    <Handle
-      type="target"
-      :position="Position.Left"
-      :style="{ opacity: 0, pointerEvents: 'none' }"
-    />
-    <!-- ROOT: sempre card -->
-    <div
-      v-if="data.level === 'CoreMarket'"
-      class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
-      :class="{
-        'border-blue-500 border-2': selected,
-        'hover:border-blue-400': !selected,
-      }"
-    >
-      <!-- Input connection point (left) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-      />
-
-      <!-- Node content -->
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center mb-1">
-          <div class="mr-2 flex items-center" v-if="data.iconName">
-            <component :is="ICONS[data.iconName]" v-if="ICONS[data.iconName]" />
-          </div>
-          <div class="font-semibold text-sm flex-grow text-white">
-            {{ data.label || label }}
-          </div>
-        </div>
-        <div class="text-xs opacity-90 mt-1" v-if="data.description">
-          {{ data.description }}
-        </div>
-      </div>
-
-      <!-- Output connection point (right) -->
-      <div
-        class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-      />
-    </div>
-
-    <!-- External connector + button (root) -->
-    <div
-      v-if="hasChildren && data.level === 'CoreMarket'"
-      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10"
-    >
-      <!-- connector line (fixed, ends before the button) -->
-      <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
-      <!-- outlined circle button drawing +/- with CSS -->
-      <button
-        @click.stop="toggle"
-        aria-label="Expandir/contrair"
-        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
-        :class="{
-          // show vertical bar only when collapsed (plus)
-          'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
-            !isExpanded,
-        }"
-      />
-    </div>
-
-    <!-- NÃO-ROOT: lightweight por padrão, card no hover/focus -->
-    <div v-if="data.level !== 'CoreMarket'" class="w-64">
-      <!-- Lightweight (texto simples) -->
-      <span
-        class="block text-sm text-white leading-snug truncate group-hover:hidden group-focus-visible:hidden"
-      >
-        {{ data.label || label }}
-      </span>
-
-      <!-- Card no hover/focus -->
-      <div
-        class="hidden group-hover:flex group-focus-visible:flex p-3 rounded-lg bg-[#1d1d1f] border border-gray-800 shadow-lg transition-all duration-200 items-start gap-2"
-        :class="{
-          'border-blue-500 border-2': selected,
-          'hover:border-blue-400': !selected,
-        }"
-      >
-        <!-- Input connection point (left) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 left-[-6px]"
-        />
-
-        <!-- Node content -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center mb-1">
-            <div class="mr-2 flex items-center" v-if="data.iconName">
-              <component
-                :is="ICONS[data.iconName]"
-                v-if="ICONS[data.iconName]"
-              />
-            </div>
-            <div class="font-semibold text-lg flex-grow text-white">
-              {{ data.label || label }}
-            </div>
-          </div>
-          <div class="text-xs opacity-90 mt-1" v-if="data.description">
-            {{ data.description }}
-          </div>
-          <div class="mt-2 flex gap-2">
-            <button
-              v-if="data.onPrimary"
-              class="rounded-md bg-white/10 px-2 py-1 text-xs hover:bg-white/20 text-white"
-              @click.stop="data.onPrimary?.()"
-            >
-              Pesquisar categoria
-            </button>
-          </div>
-        </div>
-
-        <!-- Output connection point (right) -->
-        <div
-          class="absolute w-3 h-3 bg-white rounded-full border-2 border-indigo-600 top-1/2 -translate-y-1/2 opacity-0 transition-opacity pointer-events-none group-hover:opacity-100 group-focus-visible:opacity-100 right-[-6px]"
-        />
-      </div>
-
-      <!-- External connector + button (non-root, shows on hover) -->
-      <div
-        v-if="hasChildren && data.level !== 'CoreMarket'"
-        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
-      >
-        <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
-        <button
-          @click.stop="toggle"
-          aria-label="Expandir/contrair"
-          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded"
-          :class="{
-            'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
-              !isExpanded,
-          }"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-// Auto-imported in Nuxt 3: ref, computed, nextTick, defineAsyncComponent
-import HeartIcon from "~/components/icon/HeartIcon.vue";
-
-// Use Vue Flow and store
-const { useVueFlow } = await import("@vue-flow/core");
-const { useMindMapStore } = await import("~/stores/mindMapStore");
-const { Handle, Position } = await import("@vue-flow/core");
-
-const isHovered = ref(false);
-const store = useMindMapStore();
-const { updateNodeInternals } = useVueFlow();
-
-// Non-reactive icon registry
-const ICONS: Record<string, any> = {
-  heart: HeartIcon,
-};
-
-// Component props
-const props = defineProps({
-  id: {
-    type: String,
-    required: true,
-  },
-  data: {
-    type: Object,
-    required: true,
-    default: () => ({
-      level: "Category",
-      isExpanded: false,
-      children: [],
-    }),
-  },
-  label: {
-    type: String,
-    default: "",
-  },
-  type: {
-    type: String,
-    default: "default",
-  },
-  selected: {
-    type: Boolean,
-    default: false,
-  },
-  isConnectable: {
-    type: Boolean,
-    default: true,
-  },
-  position: {
-    type: Object,
-    required: true,
-    default: () => ({ x: 0, y: 0 }),
-  },
-  // Vue Flow connection points
-  sourcePosition: {
-    type: String,
-    default: "right",
-  },
-  targetPosition: {
-    type: String,
-    default: "left",
-  },
-});
-
-// Computed properties
-const hasChildren = computed(() => {
-  return props.data?.children?.length > 0;
-});
-
-const isExpanded = computed(() => {
-  return !!props.data?.isExpanded;
-});
-
-// Toggle node expansion
-const toggle = () => {
-  store.toggleNode(props.id);
-  // Force Vue Flow to recalculate after state change on the next frame
-  if (typeof window !== "undefined") {
-    requestAnimationFrame(() => {
-      updateNodeInternals();
-    });
-  }
-};
-
-// Expose connection points for Vue Flow
-const connectionPoints = {
-  source: "right",
-  target: "left",
-};
-
-defineExpose({
-  connectionPoints,
-});
-</script>
-
-<style scoped>
-.vue-flow__edge-path {
-  pointer-events: none;
-}
-</style>
 </file>
 
 <file path="pages/login.vue">
@@ -2552,117 +2633,128 @@ export const useMindMapStore = defineStore("mindMap", {
 </file>
 
 <file path="nuxt.config.ts">
+import { defineNuxtConfig } from "nuxt/config";
+// Local typing for @nuxtjs/tailwindcss config key to satisfy TS in editors
+declare module "nuxt/schema" {
+  interface NuxtConfig {
+    tailwindcss?: {
+      cssPath?: string | false;
+      configPath?: string;
+      exposeConfig?: boolean;
+      injectPosition?: number;
+      viewer?: boolean;
+      editorSupport?: boolean;
+      [key: string]: unknown;
+    };
+  }
+  // Ensure NuxtOptions also sees the augmentation
+  interface NuxtOptions extends NuxtConfig {}
+}
+export {};
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { defineNuxtConfig } from 'nuxt/config';
-
 export default defineNuxtConfig({
   // TypeScript configuration
   typescript: {
     strict: true,
-    typeCheck: true,
+    typeCheck: "build",
+    shim: false, // Disable shim as we're using takeOver mode
     tsConfig: {
       compilerOptions: {
-        // Enable Vue 3 composition API reactivity transform
-        jsx: 'preserve',
-        // Improve type checking for Vue components
-        jsxImportSource: 'vue',
-        // Enable strictest type checking
+        target: "ESNext",
+        module: "ESNext",
+        moduleResolution: "bundler",
         strict: true,
-        // Better support for Vue's reactivity system
+        jsx: "preserve",
+        sourceMap: true,
+        resolveJsonModule: true,
+        isolatedModules: true,
+        esModuleInterop: true,
+        lib: ["ESNext", "DOM", "DOM.Iterable"],
         skipLibCheck: true,
-        // Support for modern JavaScript features
-        target: 'ESNext',
-        module: 'ESNext',
-        moduleResolution: 'node',
-        // Support for path aliases
-        baseUrl: '.',
+        noEmit: true,
+        baseUrl: ".",
         paths: {
-          '~/*': ['./*']
+          "~/*": ["./*"],
+          "@/*": ["./*"],
         },
-        // Type checking for Vue files
-        types: [
-          '@nuxt/types',
-          '@pinia/nuxt',
-          '@vue/runtime-dom',
-          '@vue/compiler-sfc',
-          'vite/client'
-        ]
+        types: ["@pinia/nuxt", "vite/client", "vue", "nuxt/schema"],
       },
       include: [
-        '**/*.ts',
-        '**/*.d.ts',
-        '**/*.tsx',
-        '**/*.vue'
-      ]
-    }
-  },
-  
-  // Core configuration
-  compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-  srcDir: ".",
-  
-  // Build configuration
-  build: {
-    transpile: ["@vue-flow/core"],
-  },
-  
-  // Global CSS
-  css: [
-    '~/assets/css/tailwind.css'
-  ],
-
-  // Modules
-  modules: [
-    "@nuxtjs/supabase", 
-    "@vueuse/nuxt", 
-    "@pinia/nuxt",
-    "@nuxtjs/tailwindcss"
-  ],
-  
-  // Tailwind CSS configuration
-  // @ts-ignore - Tailwind types will be available after module is loaded
-  tailwindcss: {
-    cssPath: '~/assets/css/tailwind.css',
-    configPath: 'tailwind.config',
-    exposeConfig: false,
-    injectPosition: 0,
-    viewer: true,
-  } as any,
-
-
-  // Supabase module configuration
-  // @ts-ignore - Supabase types are not properly recognized
-  supabase: {
-    // Use environment variables directly
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_ANON_KEY,
-    
-    // Disable built-in redirects
-    redirect: false,
-    
-    // Client options
-    clientOptions: {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
-    }
+        "**/*.ts",
+        "**/*.d.ts",
+        "**/*.tsx",
+        "**/*.vue",
+        ".nuxt/types/**/*.ts",
+        "types/**/*.d.ts",
+        "types/**/*.ts",
+        "composables/**/*",
+        "utils/**/*",
+      ],
+      exclude: ["node_modules", ".nuxt", ".output", "dist"],
+    },
   },
 
-  // TypeScript configuration is now at the top of the file
-
-  // Components configuration
-  components: ["~/components", "~/components/landing"],
-
-  // Auto-imports
-  imports: {
-    autoImport: true,
+  // Vue configuration
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag: string) => tag.startsWith("v-"),
+      whitespace: "condense",
+      comments: false,
+    },
   },
+
+  // Pinia configuration is handled by @pinia/nuxt module
 
   // Vite configuration
   vite: {
+    define: {
+      "process.env.DEBUG": JSON.stringify(process.env.DEBUG || "false"),
+      "process.env.NODE_ENV": JSON.stringify(
+        process.env.NODE_ENV || "development"
+      ),
+    },
+    optimizeDeps: {
+      include: [
+        "vue",
+        "@vueuse/core",
+        "pinia",
+        "vue-router",
+        "ofetch",
+        "defu",
+        "h3",
+        "unhead",
+      ],
+    },
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 100,
+      },
+      hmr: {
+        protocol: "ws",
+        host: "localhost",
+        port: 3000,
+        overlay: true,
+      },
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `
+            @use "sass:color";
+            @use "sass:list";
+            @use "sass:map";
+            @use "sass:math";
+            @use "sass:meta";
+            @use "sass:selector";
+            @use "sass:string";
+            @use "sass:color" as *;
+            @import "@/assets/styles/variables";
+            @import "@/assets/styles/mixins";
+          `,
+        },
+      },
+    },
     vue: {
       script: {
         defineModel: true,
@@ -2683,14 +2775,67 @@ export default defineNuxtConfig({
     ],
   },
 
+  // Global CSS
+  css: ["~/assets/css/tailwind.css"],
+
+  // Modules
+  modules: [
+    "@nuxtjs/supabase",
+    "@vueuse/nuxt",
+    [
+      "@pinia/nuxt",
+      {
+        autoImports: ["defineStore", "storeToRefs", "acceptHMRUpdate"],
+      },
+    ],
+    "@nuxtjs/tailwindcss",
+  ],
+
+  // Tailwind CSS configuration
+  tailwindcss: {
+    cssPath: "~/assets/css/tailwind.css",
+    configPath: "tailwind.config",
+    exposeConfig: false,
+    injectPosition: 0,
+    viewer: true,
+  },
+
+  // Supabase module configuration
+  // @ts-ignore - Supabase types are not properly recognized
+  supabase: {
+    // Use environment variables directly
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_ANON_KEY,
+
+    // Disable built-in redirects
+    redirect: false,
+
+    // Client options
+    clientOptions: {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    },
+  },
+
+  // Components configuration
+  components: ["~/components", "~/components/landing"],
+
+  // Auto-imports
+  imports: {
+    autoImport: true,
+  },
+
   // Runtime config
   runtimeConfig: {
     public: {
       // Will be available on both server and client
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-      supabaseUrl: process.env.SUPABASE_URL || '',
-      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
-    }
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+      supabaseUrl: process.env.SUPABASE_URL || "",
+      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
+    },
   },
 });
 </file>
@@ -2737,36 +2882,337 @@ export default defineNuxtConfig({
 }
 </file>
 
-<file path="tsconfig.app.json">
-{
-  "extends": "./nuxt.tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["./*"]
-    },
-    "types": [
-      "node",
-      "@nuxt/types",
-      "@pinia/nuxt",
-      "@nuxtjs/i18n",
-      "@vue/runtime-dom",
-      "@vue/compiler-sfc",
-      "./types/vue-flow-controls",
-      "vite/client"
-    ]
+<file path="components/canvas/MindMapNode.vue">
+<template>
+  <div
+    class="group relative w-auto select-none"
+    tabindex="0"
+  >
+    <Handle
+      type="source"
+      :position="Position.Right"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <Handle
+      type="target"
+      :position="Position.Left"
+      :style="{ opacity: 0, pointerEvents: 'none' }"
+    />
+    <!-- ROOT: sempre card -->
+    <div
+      v-if="data.level === 'CoreMarket'"
+      class="p-4 rounded-lg bg-[#17171C] shadow-lg transition-all duration-200 flex items-start gap-3 border-t border-t-[#47464B]"
+    >
+      <!-- Node content -->
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center mb-1">
+          <div class="mr-2 flex items-center" v-if="data.iconName">
+            <component :is="ICONS[data.iconName]" v-if="ICONS[data.iconName]" />
+          </div>
+          <div class="font-semibold text-sm flex-grow text-white">
+            {{ data.label || label }}
+          </div>
+        </div>
+        <div class="text-xs opacity-90 mt-1" v-if="data.description">
+          {{ data.description }}
+        </div>
+      </div>
+
+      <!-- Output connection point (right) -->
+    </div>
+
+    <!-- External connector + button (root) -->
+    <div
+      v-if="hasChildren && data.level === 'CoreMarket'"
+      class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 group nodrag nowheel nopan"
+      @mousedown.stop
+      @pointerdown.stop
+      @wheel.stop.prevent
+      @touchstart.stop
+      @dblclick.stop.prevent
+    >
+      <!-- connector line (fixed, ends before the button) -->
+      <div class="h-[2px] bg-[#5A5A60] flex-grow"></div>
+      <!-- outlined circle button drawing +/- with CSS -->
+      <button
+        type="button"
+        @mousedown.stop
+        @pointerdown.stop
+        @wheel.stop.prevent
+        @touchstart.stop
+        @click.stop="toggle"
+        @dblclick.stop.prevent
+        aria-label="Expandir/contrair"
+        class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded hover:border-[#8E6CE4] hover:before:bg-[#8E6CE4] hover:after:bg-[#8E6CE4] nodrag nowheel nopan"
+        style="touch-action: manipulation"
+        :class="{
+          // show vertical bar only when collapsed (plus)
+          'after:content-[\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+            !isExpanded,
+        }"
+      />
+    </div>
+
+    <!-- Non-root nodes with BaseNodeShell -->
+    <div v-if="data.level !== 'CoreMarket'" class="relative w-full h-full">
+      <BaseNodeShell
+        :width="192"
+        :height="100"
+        class="block relative"
+        :data-node-id="props.id"
+        :showOverlay="showOverlay"
+        @mouseenter="onRootMouseEnter"
+        @mouseleave="onRootMouseLeave"
+      >
+        <!-- Lightweight text (always in DOM, toggles opacity) -->
+        <LightweightText
+          :label="data.label || label"
+          :reserveRight="hasChildren"
+          :class="showOverlay ? 'opacity-0' : 'opacity-100'"
+          :aria-hidden="showOverlay ? 'true' : 'false'"
+        />
+
+        <!-- Card overlay (conditionally rendered) -->
+        <template #overlay>
+          <div class="absolute inset-0 z-10 w-full h-full" style="pointer-events: auto;">
+            <CardOverlay
+              :label="data.label || label"
+              :description="data.description"
+              :selected="selected"
+              @primary="data.onPrimary?.()"
+            >
+              <template #icon>
+                <component
+                  :is="ICONS[data.iconName]"
+                  v-if="data.iconName && ICONS[data.iconName]"
+                />
+              </template>
+            </CardOverlay>
+          </div>
+        </template>
+      </BaseNodeShell>
+
+      <!-- External connector + button (non-root, shows on hover) -->
+      <div
+        v-if="hasChildren && data.level !== 'CoreMarket'"
+        class="absolute right-[-64px] top-1/2 -translate-y-1/2 flex items-center w-16 h-10 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity group nodrag nowheel nopan"
+        @mousedown.stop
+        @pointerdown.stop
+        @wheel.stop.prevent
+        @touchstart.stop
+        @dblclick.stop.prevent
+      >
+        <div class="h-[2px] bg-[#5A5A60]"></div>
+        <button
+          type="button"
+          @mousedown.stop
+          @pointerdown.stop
+          @wheel.stop.prevent
+          @touchstart.stop
+          @click.stop="toggle"
+          @dblclick.stop.prevent
+          aria-label="Expandir/contrair"
+          class="z-10 w-8 h-8 rounded-full border-2 border-[#5A5A60] bg-[#0d0d12] shadow-sm transition-transform hover:scale-[1.03] relative before:content-[''] before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2.5 before:h-[2px] before:bg-[#5A5A60] before:rounded hover:border-[#8E6CE4] hover:before:bg-[#8E6CE4] hover:after:bg-[#8E6CE4] nodrag nowheel nopan"
+          style="touch-action: manipulation"
+          :class="{
+            'after:content-[\'\'\'] after:absolute after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-[2px] after:h-2.5 after:bg-[#5A5A60] after:rounded':
+              !isExpanded,
+          }"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import HeartIcon from "~/components/icon/HeartIcon.vue";
+// Simple nextTick implementation as a fallback
+const nextTick = () => new Promise(resolve => setTimeout(resolve, 0));
+import LightweightText from "~/components/canvas/node/LightweightText.vue";
+import BaseNodeShell from "~/components/canvas/base/BaseNodeShell.vue";
+import CardOverlay from "~/components/canvas/node/CardOverlay.vue";
+
+// Use Vue Flow and store
+const { useVueFlow } = await import("@vue-flow/core");
+const { useMindMapStore } = await import("~/stores/mindMapStore");
+const { Handle, Position } = await import("@vue-flow/core");
+
+// const isHovered = ref(false);  // Removed as per instructions
+const store = useMindMapStore();
+const { updateNodeInternals } = useVueFlow();
+
+// Non-reactive icon registry
+const ICONS: Record<string, any> = {
+  heart: HeartIcon,
+};
+
+// Component props
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
   },
-  "include": [
-    "components/**/*",
-    "layouts/**/*",
-    "middleware/**/*",
-    "pages/**/*",
-    "plugins/**/*",
-    "types/**/*.d.ts",
-    "app.vue"
-  ]
+  data: {
+    type: Object,
+    required: true,
+    default: () => ({
+      level: "Category",
+      isExpanded: false,
+      children: [],
+    }),
+  },
+  label: {
+    type: String,
+    default: "",
+  },
+  type: {
+    type: String,
+    default: "default",
+  },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
+  isConnectable: {
+    type: Boolean,
+    default: true,
+  },
+  position: {
+    type: Object,
+    required: true,
+    default: () => ({ x: 0, y: 0 }),
+  },
+  // Vue Flow connection points
+  sourcePosition: {
+    type: String,
+    default: "right",
+  },
+  targetPosition: {
+    type: String,
+    default: "left",
+  },
+});
+
+// Computed properties
+const hasChildren = computed(
+  (): boolean => (props.data?.children?.length ?? 0) > 0
+);
+
+const isExpanded = computed(() => {
+  return !!props.data?.isExpanded;
+});
+
+
+// Track hover state for the node locally
+const isHovered = ref(false);
+
+// Debug logging for hover state changes
+watch(isHovered, (newVal: boolean) => {
+  console.log(`[MindMapNode] Hover state changed: ${newVal}`, {
+    nodeId: props.id,
+    label: props.data?.label || props.label,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Show overlay based on local hover state
+const showOverlay = computed<boolean>(() => {
+  const shouldShow = isHovered.value;
+  console.log(`[MindMapNode] showOverlay: ${shouldShow}`, {
+    nodeId: props.id,
+    label: props.data?.label || props.label,
+    timestamp: new Date().toISOString()
+  });
+  return shouldShow;
+});
+
+// Update node internals when overlay visibility changes
+watch(() => showOverlay.value, async (isShowing: boolean) => {
+  if (isShowing && typeof window !== "undefined") {
+    await nextTick();
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    updateNodeInternals(props.id);
+  }
+});
+
+function onRootMouseEnter(event: MouseEvent) {
+  if (props.data?.level === "CoreMarket") return;
+  
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  
+  console.log('[MindMapNode] Mouse enter:', {
+    nodeId: props.id,
+    label: props.data?.label || props.label,
+    target: event.target,
+    currentTarget: event.currentTarget,
+    timestamp: new Date().toISOString()
+  });
+  
+  isHovered.value = true;
+  
+  // Force Vue Flow to update the node
+  if (typeof window !== 'undefined') {
+    requestAnimationFrame(() => {
+      console.log('[MindMapNode] Updating node internals after mouse enter');
+      updateNodeInternals(props.id);
+    });
+  }
 }
+
+function onRootMouseLeave(event: MouseEvent) {
+  if (props.data?.level === "CoreMarket") return;
+  
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  
+  console.log('[MindMapNode] Mouse leave:', {
+    nodeId: props.id,
+    label: props.data?.label || props.label,
+    target: event.target,
+    currentTarget: event.currentTarget,
+    timestamp: new Date().toISOString()
+  });
+  
+  isHovered.value = false;
+  
+  // Force Vue Flow to update the node
+  if (typeof window !== 'undefined') {
+    requestAnimationFrame(() => {
+      console.log('[MindMapNode] Updating node internals after mouse leave');
+      updateNodeInternals(props.id);
+    });
+  }
+}
+
+
+// Toggle node expansion
+const toggle = () => {
+  store.toggleNode(props.id);
+  // Force Vue Flow to recalculate after state change on the next frame
+  if (typeof window !== "undefined") {
+    requestAnimationFrame(() => {
+      updateNodeInternals();
+    });
+  }
+};
+
+// Expose connection points for Vue Flow
+const connectionPoints = {
+  source: "right",
+  target: "left",
+};
+
+defineExpose({
+  connectionPoints,
+});
+</script>
+
+<style scoped>
+.vue-flow__edge-path {
+  pointer-events: none;
+}
+</style>
 </file>
 
 <file path="components/Header.vue">

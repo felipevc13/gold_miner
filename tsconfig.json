@@ -1,66 +1,18 @@
-// Base TypeScript configuration for Nuxt 3
 {
-  // Extend from the Nuxt recommended tsconfig
   "extends": "./.nuxt/tsconfig.json",
-  
-  // Compiler options
   "compilerOptions": {
-    // Type checking
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "noEmit": true,
-    
-    // Module resolution
-    "baseUrl": ".",
-    "moduleResolution": "bundler",
     "module": "esnext",
-    "target": "ESNext",
-    "jsx": "preserve",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    
-    // Path aliases
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+    "allowJs": false,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@/*": ["./*"],
-      "#imports": ["./.nuxt/imports.d.ts"],
-      "#components": ["./components"]
+      "@/*": ["./*"]
     }
   },
-  
-  // Include these files for type checking
-  "include": [
-    ".nuxt/nuxt.d.ts",
-    "components/**/*",
-    "composables/**/*",
-    "layouts/**/*",
-    "middleware/**/*",
-    "pages/**/*",
-    "plugins/**/*",
-    "app.vue",
-    "error.vue",
-    "types/**/*.d.ts",
-    "types/**/*.ts"
-  ],
-  
-  // Exclude these files from type checking
-  "exclude": [
-    "node_modules",
-    ".nuxt",
-    ".output",
-    "dist"
-  ]
+  "include": ["**/*.ts", "**/*.vue", "types/**/*.d.ts", ".nuxt"]
 }
