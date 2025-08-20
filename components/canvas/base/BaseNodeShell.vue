@@ -9,99 +9,38 @@
     }"
     v-bind="$attrs"
     :data-debug-overlay="showOverlay ? 'visible' : 'hidden'"
-    @mouseenter="onMouseEnter"
-    @mouseleave="onMouseLeave"
   >
-    <!-- Base content (lightweight). Maintains footprint, centered. -->
+    <!-- Base content (lightweight) - always present, just changes opacity -->
     <div
       class="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
-      :class="showOverlay ? 'opacity-0' : 'opacity-100'"
+      :class="{ 'opacity-0': showOverlay, 'opacity-100': !showOverlay }"
       style="pointer-events: none; will-change: opacity"
     >
       <slot />
     </div>
 
-    <!-- Overlay for the card, controlled externally. Doesn't change node size. -->
-    <transition
-      name="fade"
-      mode="out-in"
-      @before-enter="onBeforeEnter"
-      @enter="onEnter"
-      @after-enter="onAfterEnter"
-      @before-leave="onBeforeLeave"
-      @leave="onLeave"
-      @after-leave="onAfterLeave"
-      :css="false"
+    <!-- Overlay content - conditionally rendered -->
+    <div
+      v-if="showOverlay"
+      class="absolute inset-0 z-10 transition-opacity duration-150"
+      style="will-change: transform, opacity; pointer-events: auto;"
+      @click="handleOverlayClick"
     >
       <div
-        v-if="showOverlay"
-        class="absolute inset-0 z-10"
-        style="will-change: transform, opacity; pointer-events: auto"
-        @click="handleOverlayClick"
+        v-if="!slots.overlay"
+        class="w-full h-full flex items-center justify-center bg-red-500/10"
       >
-        <div
-          v-if="!slots.overlay"
-          class="w-full h-full flex items-center justify-center bg-red-500/10"
-        >
-          <div class="text-xs text-red-500 p-2 bg-white/90 rounded">
-            No overlay slot content provided
-          </div>
+        <div class="text-xs text-red-500 p-2 bg-white/90 rounded">
+          No overlay slot content provided
         </div>
-        <slot v-else name="overlay" />
       </div>
-    </transition>
+      <slot v-else name="overlay" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as Vue from "vue";
-const onMouseEnter = () => {
-  console.log("BaseNodeShell - mouseenter", {
-    showOverlay: props.showOverlay,
-    timestamp: new Date().toISOString(),
-  });
-};
-const onMouseLeave = () => {
-  console.log("BaseNodeShell - mouseleave", {
-    showOverlay: props.showOverlay,
-    timestamp: new Date().toISOString(),
-  });
-};
-const onBeforeEnter = () =>
-  console.log("Overlay - before enter", {
-    timestamp: new Date().toISOString(),
-  });
-const onEnter = (el: Element, done: () => void) => {
-  console.log("Overlay - enter", { timestamp: new Date().toISOString() });
-  requestAnimationFrame(() => {
-    (el as HTMLElement).style.opacity = "1";
-    done();
-  });
-};
-const onAfterEnter = () =>
-  console.log("Overlay - after enter", { timestamp: new Date().toISOString() });
-const onBeforeLeave = () =>
-  console.log("Overlay - before leave", {
-    timestamp: new Date().toISOString(),
-  });
-const onLeave = (el: Element, done: () => void) => {
-  console.log("Overlay - leave", { timestamp: new Date().toISOString() });
-  requestAnimationFrame(() => {
-    (el as HTMLElement).style.opacity = "0";
-    setTimeout(done, 150); // Match this with the transition duration
-  });
-};
-const onAfterLeave = () =>
-  console.log("Overlay - after leave", { timestamp: new Date().toISOString() });
-const handleOverlayClick = (e: MouseEvent) => {
-  console.log("Overlay - click", {
-    target: e.target,
-    currentTarget: e.currentTarget,
-    hasOverlaySlot: !!slots.overlay,
-    timestamp: new Date().toISOString(),
-  });
-  e.stopPropagation();
-};
 
 // Component props with TypeScript interface
 interface Props {
@@ -116,6 +55,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const slots = (Vue as unknown as { useSlots: () => any }).useSlots();
+
+const handleOverlayClick = (e: MouseEvent) => {
+  if (props.debug) {
+    console.log("Overlay - click", {
+      target: e.target,
+      currentTarget: e.currentTarget,
+      hasOverlaySlot: !!slots.overlay,
+      timestamp: new Date().toISOString(),
+    });
+  }
+  e.stopPropagation();
+};
 
 /**
  * BaseNodeShell

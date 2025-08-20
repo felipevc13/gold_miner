@@ -200,6 +200,7 @@ const initialNodes: MindMapNode[] = [
 
 export const useMindMapStore = defineStore("mindMap", {
   state: () => ({
+    activeNodeId: null as string | null,  // Track which node should show the overlay
     nodes: initialNodes,
   }),
 
@@ -317,6 +318,12 @@ export const useMindMapStore = defineStore("mindMap", {
   },
 
   actions: {
+    setActiveNode(nodeId: string | null) {
+      this.activeNodeId = nodeId;
+    },
+    clearActiveNode() {
+      this.activeNodeId = null;
+    },
     toggleNode(nodeId: string) {
       const findAndToggle = (nodes: MindMapNode[]): boolean => {
         for (const node of nodes) {

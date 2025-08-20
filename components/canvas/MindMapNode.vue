@@ -75,7 +75,7 @@
         :height="100"
         class="block relative"
         :data-node-id="props.id"
-        :showOverlay="showOverlay"
+        :showOverlay="isActive"
         @mouseenter="onRootMouseEnter"
         @mouseleave="onRootMouseLeave"
       >
@@ -83,8 +83,8 @@
         <LightweightText
           :label="data.label || label"
           :reserveRight="hasChildren"
-          :class="showOverlay ? 'opacity-0' : 'opacity-100'"
-          :aria-hidden="showOverlay ? 'true' : 'false'"
+          :class="{ 'opacity-0': isActive, 'opacity-100': !isActive }"
+          :aria-hidden="isActive ? 'true' : 'false'"
         />
 
         <!-- Card overlay (conditionally rendered) -->
@@ -152,9 +152,11 @@ const { useVueFlow } = await import("@vue-flow/core");
 const { useMindMapStore } = await import("~/stores/mindMapStore");
 const { Handle, Position } = await import("@vue-flow/core");
 
-// const isHovered = ref(false);  // Removed as per instructions
 const store = useMindMapStore();
 const { updateNodeInternals } = useVueFlow();
+
+// Computed to check if this node is the active one
+const isActive = computed(() => store.activeNodeId === props.id);
 
 // Non-reactive icon registry
 const ICONS: Record<string, any> = {
@@ -264,7 +266,8 @@ function onRootMouseEnter(event: MouseEvent) {
     timestamp: new Date().toISOString()
   });
   
-  isHovered.value = true;
+  // Set this node as active in the store
+  store.setActiveNode(props.id);
   
   // Force Vue Flow to update the node
   if (typeof window !== 'undefined') {
@@ -276,11 +279,10 @@ function onRootMouseEnter(event: MouseEvent) {
 }
 
 function onRootMouseLeave(event: MouseEvent) {
-  if (props.data?.level === "CoreMarket") return;
+  // Don't clear the active node here - it will be updated when entering another node
+  // This creates the behavior where the overlay stays until another node is hovered
   
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-  
+  // Still log for debugging
   console.log('[MindMapNode] Mouse leave:', {
     nodeId: props.id,
     label: props.data?.label || props.label,
@@ -288,16 +290,6 @@ function onRootMouseLeave(event: MouseEvent) {
     currentTarget: event.currentTarget,
     timestamp: new Date().toISOString()
   });
-  
-  isHovered.value = false;
-  
-  // Force Vue Flow to update the node
-  if (typeof window !== 'undefined') {
-    requestAnimationFrame(() => {
-      console.log('[MindMapNode] Updating node internals after mouse leave');
-      updateNodeInternals(props.id);
-    });
-  }
 }
 
 
