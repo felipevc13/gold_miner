@@ -10,20 +10,28 @@
     v-bind="$attrs"
     :data-debug-overlay="showOverlay ? 'visible' : 'hidden'"
   >
-    <!-- Base content (lightweight) - always present, just changes opacity -->
+    <!-- Main content (always in DOM, toggles opacity) -->
     <div
-      class="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
+      ref="contentRef"
+      class="w-full h-full transition-opacity duration-200 relative"
       :class="{ 'opacity-0': showOverlay, 'opacity-100': !showOverlay }"
       style="pointer-events: none; will-change: opacity"
     >
       <slot />
+      
+      <!-- Connector line (always visible) -->
+      <div 
+        v-if="hasChildren"
+        class="absolute right-[-4px] top-1/2 -translate-y-1/2 w-4 h-[2px] bg-[#5A5A60] z-10"
+        style="pointer-events: none;"
+      ></div>
     </div>
 
     <!-- Overlay content - conditionally rendered -->
     <div
       v-if="showOverlay"
       class="absolute inset-0 z-10 transition-opacity duration-150"
-      style="will-change: transform, opacity; pointer-events: auto;"
+      style="will-change: transform, opacity; pointer-events: none;"
       @click="handleOverlayClick"
     >
       <div

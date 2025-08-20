@@ -5,7 +5,12 @@
     class="w-full h-full p-3 rounded-lg bg-[#1d1d1f] border-t border-t-[#47464B] shadow-lg transition-all duration-200 flex items-start gap-2 transform hover:scale-[1.02] hover:shadow-xl hover:z-20"
     :data-node-id="nodeId"
     :data-visible="isVisible"
-    style="backface-visibility: hidden; transform-style: preserve-3d; will-change: transform, box-shadow; pointer-events: auto;"
+    style="
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      will-change: transform, box-shadow;
+      pointer-events: auto;
+    "
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
@@ -41,9 +46,7 @@
 </template>
 
 <script setup lang="ts">
-// Explicitly import Vue Composition API functions
-import { useSlots, onMounted, watch, ref } from 'vue';
-import type { Ref } from 'vue';
+// Vue Composition API functions are auto-imported by Nuxt
 
 // Component props with TypeScript interface
 interface Props {
@@ -56,64 +59,59 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  description: '',
-  ctaText: 'Pesquisar categoria',
-  nodeId: '',
+  description: "",
+  ctaText: "Pesquisar categoria",
+  nodeId: "",
   isVisible: false,
-  selected: false
+  selected: false,
 });
 
-const emit = defineEmits<{ (e: 'primary'): void }>();
-const slots = useSlots();
-const cardRef: Ref<HTMLElement | null> = ref(null);
+const emit = defineEmits<{ (e: "primary"): void }>();
+const cardRef = ref<HTMLElement | null>(null);
 
-// Debug logging
+// Component mounted
 onMounted(() => {
-  console.log(`[CardOverlay] Mounted for node: ${props.nodeId}`, {
-    label: props.label,
-    isVisible: props.isVisible,
-    hasIcon: !!slots.icon,
-    hasDefaultSlot: !!slots.default,
-    hasActionsSlot: !!slots.actions,
-    timestamp: new Date().toISOString()
-  });
+  // Component initialization if needed
 });
 
 // Watch for visibility changes
-watch(() => props.isVisible, (newVal: boolean) => {
-  console.log(`[CardOverlay] Visibility changed: ${newVal}`, {
-    nodeId: props.nodeId,
-    label: props.label,
-    timestamp: new Date().toISOString()
-  });
-});
+watch(
+  () => props.isVisible,
+  (newVal: boolean) => {
+    console.log(`[CardOverlay] Visibility changed: ${newVal}`, {
+      nodeId: props.nodeId,
+      label: props.label,
+      timestamp: new Date().toISOString(),
+    });
+  }
+);
 
 function onMouseEnter(event: MouseEvent) {
-  console.log('[CardOverlay] Mouse enter:', {
+  console.log("[CardOverlay] Mouse enter:", {
     nodeId: props.nodeId,
     label: props.label,
     target: event.target,
     currentTarget: event.currentTarget,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }
 
 function onMouseLeave(event: MouseEvent) {
-  console.log('[CardOverlay] Mouse leave:', {
+  console.log("[CardOverlay] Mouse leave:", {
     nodeId: props.nodeId,
     label: props.label,
     target: event.target,
     currentTarget: event.currentTarget,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 }
 
 function onPrimary() {
-  console.log('[CardOverlay] Primary action triggered:', {
+  console.log("[CardOverlay] Primary action triggered:", {
     nodeId: props.nodeId,
     label: props.label,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  emit('primary');
+  emit("primary");
 }
 </script>
