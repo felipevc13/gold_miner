@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-[#17171C] text-white">
+  <div class="min-h-screen bg-[#0D0D12] text-white">
     <LandingHeader />
-    <main class="w-full mx-auto">
+    <main class="w-full mx-auto pt-20">
       <HeroSection />
     </main>
   </div>
