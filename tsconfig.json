@@ -1,18 +1,29 @@
 {
+  // ESTE ARQUIVO É GERENCIADO PELO NUXT. NÃO EDITE DIRETAMENTE.
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "module": "esnext",
     "moduleResolution": "bundler",
-    "target": "ES2020",
-    "allowJs": false,
-    "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "allowJs": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
       "@/*": ["./*"]
-    }
+    },
+    // Garante que o Volar (extensão do VS Code) entenda o ambiente Nuxt
+    "types": ["nuxt/schema"]
   },
-  "include": ["**/*.ts", "**/*.vue", "types/**/*.d.ts", ".nuxt"]
+  // Inclui todos os arquivos necessários para o Nuxt entender seu projeto
+  "include": [
+    "**/*.ts",
+    "**/*.d.ts",
+    "**/*.tsx",
+    "**/*.vue",
+    ".nuxt/nuxt.d.ts"
+  ],
+  "exclude": ["node_modules", ".output", "dist"]
 }

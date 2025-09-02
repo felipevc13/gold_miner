@@ -13,7 +13,10 @@ module.exports = {
     extend: {
       colors: {
         dark: '#171717',
-      }
+      },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],

@@ -125,20 +125,33 @@ export default defineNuxtConfig({
   },
 
   // Global CSS
-  css: ["~/assets/css/tailwind.css"],
+  css: ["~/assets/css/tailwind.css", "~/assets/css/global.css"],
 
   // Modules
   modules: [
+    "@nuxtjs/tailwindcss",
     "@nuxtjs/supabase",
     "@vueuse/nuxt",
+    "@nuxtjs/google-fonts",
     [
       "@pinia/nuxt",
       {
         autoImports: ["defineStore", "storeToRefs", "acceptHMRUpdate"],
       },
     ],
-    "@nuxtjs/tailwindcss",
   ],
+
+  // Google Fonts configuration
+  googleFonts: {
+    families: {
+      Roboto: [300, 400, 500, 700],
+    },
+    display: "swap",
+    download: true,
+    inject: true,
+    preload: true,
+    prefetch: true,
+  },
 
   // Tailwind CSS configuration
   tailwindcss: {
