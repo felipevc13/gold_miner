@@ -3,6 +3,8 @@
     <LandingHeader />
     <main class="w-full mx-auto pt-20">
       <HeroSection />
+      <PainPointsSection />
+      <ValuePropositionSection />
     </main>
   </div>
 </template>
