@@ -3,7 +3,7 @@
     <Transition name="modal-fade">
       <div
         v-if="isOpen"
-        class="absolute inset-0 z-[30] flex items-center justify-center p-6 bg-black bg-opacity-70"
+        class="fixed inset-0 z-[30] flex items-center justify-center p-6 bg-black bg-opacity-70"
         @click.self="handleBackdropClick"
         role="dialog"
         aria-modal="true"
@@ -13,11 +13,12 @@
       >
         <div
           :class="[
-            'base-modal-container flex flex-col bg-[#171717] border border-[#343434] rounded-lg shadow-xl text-white overflow-hidden relative',
+            'base-modal-container flex flex-col bg-[#1C1C21] border border-[#343434] rounded-lg shadow-xl text-white overflow-hidden relative',
             modalSizeClass,
             modalContainerClass,
           ]"
           ref="modalContentRef"
+          tabindex="-1"
         >
           <!-- Loading overlay -->
           <div
@@ -147,10 +148,12 @@ const props = defineProps({
   bodyClass: { type: String, default: "" },
 });
 
-// Teleport target: use #modal-container if present, otherwise fallback to body
-const teleportTarget = computed(() =>
-  document.getElementById("modal-container") ? "#modal-container" : "body"
-);
+// Teleport target: use #modal-container if present (client), otherwise fallback to body
+const teleportTarget = ref<string>("body");
+onMounted(() => {
+  const host = document.getElementById("modal-container");
+  teleportTarget.value = host ? "#modal-container" : "body";
+});
 
 // Declare both 'close' and 'save' so Vue won't warn when @save is used upstream
 const emit = defineEmits(["close", "save"]);

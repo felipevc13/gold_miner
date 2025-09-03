@@ -145,6 +145,7 @@ export default defineNuxtConfig({
   googleFonts: {
     families: {
       Roboto: [300, 400, 500, 700],
+      "JetBrains+Mono": [400, 600, 700],
     },
     display: "swap",
     download: true,
@@ -197,6 +198,70 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
       supabaseUrl: process.env.SUPABASE_URL || "",
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
+    },
+  },
+
+  // App-level <head> configuration (SEO/meta)
+  app: {
+    head: {
+      title: "Gold Miner — Descubra Oportunidades Reais",
+      titleTemplate: "%s · Gold Miner",
+      htmlAttrs: { lang: "pt-BR" },
+      meta: [
+        { name: "charset", content: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "description",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+        },
+        { name: "robots", content: "index,follow" },
+        { name: "theme-color", content: "#0F0F12" },
+
+        // Open Graph
+        { property: "og:site_name", content: "Gold Miner" },
+        { property: "og:type", content: "website" },
+        { property: "og:locale", content: "pt_BR" },
+        {
+          property: "og:title",
+          content: "Gold Miner — Descubra Oportunidades Reais",
+        },
+        {
+          property: "og:description",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+        },
+        {
+          property: "og:url",
+          content: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+        },
+        { property: "og:image", content: "/og.jpg" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+
+        // Twitter
+        { name: "twitter:card", content: "summary_large_image" },
+        {
+          name: "twitter:title",
+          content: "Gold Miner — Descubra Oportunidades Reais",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+        },
+        { name: "twitter:image", content: "/og.jpg" },
+      ],
+      link: [
+        {
+          rel: "canonical",
+          href: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+        },
+        { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+        { rel: "alternate icon", type: "image/png", href: "/favicon.png" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+        { rel: "manifest", href: "/site.webmanifest" },
+      ],
     },
   },
 });
