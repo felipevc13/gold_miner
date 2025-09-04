@@ -35,7 +35,7 @@
       >
         <div class="md:col-span-7 relative order-1">
           <div
-            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
+            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22] pointer-events-none"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <Explorer class="w-full h-auto block" />
@@ -86,7 +86,7 @@
       >
         <div class="md:col-span-7 relative order-1">
           <div
-            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
+            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22] pointer-events-none"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <PainUi class="w-full h-auto block" />
@@ -128,7 +128,7 @@
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
         <div class="md:col-span-7 relative order-1">
           <div
-            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
+            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22] pointer-events-none"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <Product class="w-full h-auto block" />
@@ -170,7 +170,7 @@
       <div class="mt-12 md:mt-16">
         <div class="relative">
           <div
-            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed33] via-[#8b5cf633] to-[#7c3aed33]"
+            class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed33] via-[#8b5cf633] to-[#7c3aed33] pointer-events-none"
           ></div>
           <div
             class="relative rounded-2xl bg-[#17171d] border border-[#292935] p-6 md:p-10 text-center"
@@ -188,7 +188,11 @@
               validar sua próxima grande ideia com o poder dos dados. O risco é
               menor, a chance de sucesso é maior.
             </p>
-            <Button @click="openInvite">
+            <Button
+              data-test="cta-open-modal-how"
+              class="pointer-events-auto"
+              @click.stop="openInvite"
+            >
               Participe da Criação e Garanta seu Acesso Antecipado
             </Button>
           </div>
@@ -228,7 +232,8 @@ if (process.client) {
 }
 
 function onAcceptInvite() {
-  // TODO: personalize – ex.: redirect para /onboarding ou enviar analytics
+  // Open Useberry test in a new tab
+  window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
   isInviteOpen.value = false;
 }
 

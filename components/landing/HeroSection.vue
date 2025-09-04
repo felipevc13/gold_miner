@@ -31,7 +31,11 @@
 
           <!-- CTA Button -->
           <div class="w-full max-w-[520px] mx-auto sm:w-auto sm:self-center">
-            <Button class="w-full sm:!w-auto justify-center" @click="openModal">
+            <Button
+              data-test="cta-open-modal"
+              class="w-full sm:!w-auto justify-center pointer-events-auto"
+              @click.stop="openModal"
+            >
               {{
                 ctaText ||
                 "Participe da Criação e Garanta seu Acesso Antecipado"
@@ -90,7 +94,8 @@ if (process.client) {
 }
 
 function onAcceptInvite() {
-  // custom logic, e.g., redirect or analytics
+  // Open Useberry test in a new tab
+  window.open('https://app.useberry.com/t/8p6kNDLt1N86VD/', '_blank');
   isInviteOpen.value = false;
 }
 
