@@ -39,7 +39,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="explorerImgUrl"
+              src="/images/explorer.svg"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -95,7 +95,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="painUiImgUrl"
+              src="/images/painui.svg"
               alt="Screenshot Dores"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -142,7 +142,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="productImgUrl"
+              src="/images/product.svg"
               alt="Screenshot product"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -194,7 +194,7 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                :src="iaIconUrl"
+                src="/images/ia.svg"
                 alt="Ícone de IA"
                 class="w-12 h-12"
                 @error="handleImageError"
@@ -226,17 +226,22 @@
 <script setup lang="ts">
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
-import explorerImgUrl from "~/assets/images/explorer.svg";
-import painUiImgUrl from "~/assets/images/painui.svg";
-import productImgUrl from "~/assets/images/product.svg";
-import iaIconUrl from "~/assets/images/IA.svg";
 
-const handleImageError = (e: Event) => {
-  console.error(
-    "Erro ao carregar a imagem:",
-    (e.target as HTMLImageElement).src
-  );
-};
+function handleImageError(e: Event) {
+  const img = e.target as HTMLImageElement;
+  if (!img.dataset.fallbackTried) {
+    img.dataset.fallbackTried = "1";
+    const url = new URL(img.src);
+    const name = url.pathname.split("/").pop() || "";
+    const altCase = /[A-Z]/.test(name)
+      ? name.toLowerCase()
+      : name.toUpperCase();
+    const base = url.pathname.replace(name, "");
+    img.src = `${base}${altCase}`;
+    return;
+  }
+  console.error("Imagem não encontrada:", img.src);
+}
 
 const props = withDefaults(defineProps<{}>(), {});
 

@@ -47,14 +47,16 @@
       >
         <div class="w-full max-w-[1024px]">
           <img
-            :src="explorerHeroUrl"
+            src="/images/explorerhero.svg"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
+            @error="handleImageError"
           />
           <img
-            :src="uiPreviewUrl"
+            src="/images/ui.svg"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
+            @error="handleImageError"
           />
         </div>
       </div>
@@ -71,8 +73,6 @@
 <script setup lang="ts">
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
-import explorerHeroUrl from "~/assets/images/explorerhero.svg";
-import uiPreviewUrl from "~/assets/images/ui.svg";
 
 defineProps<{
   headline?: string;
@@ -88,5 +88,21 @@ function openModal() {
 function onAcceptInvite() {
   // custom logic, e.g., redirect or analytics
   isInviteOpen.value = false;
+}
+
+function handleImageError(e: Event) {
+  const img = e.target as HTMLImageElement;
+  if (!img.dataset.fallbackTried) {
+    img.dataset.fallbackTried = "1";
+    const url = new URL(img.src);
+    const name = url.pathname.split("/").pop() || "";
+    const altCase = /[A-Z]/.test(name)
+      ? name.toLowerCase()
+      : name.toUpperCase();
+    const base = url.pathname.replace(name, "");
+    img.src = `${base}${altCase}`;
+    return;
+  }
+  console.error("Imagem não encontrada:", img.src);
 }
 </script>
