@@ -38,11 +38,13 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <img
-              :src="explorer"
+            <NuxtImg
+              src="/images/explorer.svg"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
             />
           </div>
         </div>
@@ -94,11 +96,13 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <img
-              :src="painui"
+            <NuxtImg
+              src="/images/painui.svg"
               alt="Screenshot Dores"
               class="w-full h-auto block"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
             />
           </div>
         </div>
@@ -141,11 +145,13 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <img
-              :src="product"
+            <NuxtImg
+              src="/images/product.svg"
               alt="Screenshot product"
               class="w-full h-auto block"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
             />
           </div>
         </div>
@@ -193,11 +199,13 @@
             <div
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
-              <img
-                :src="ia"
+              <NuxtImg
+                src="/images/ia.svg"
                 alt="Ícone de IA"
                 class="w-12 h-12"
-                @error="handleImageError"
+                loading="lazy"
+                format="webp"
+                quality="80"
               />
             </div>
             <h4 class="text-white text-2xl md:text-3xl font-extrabold mb-2">
@@ -224,48 +232,8 @@
 </template>
 
 <script setup lang="ts">
-// Import images for Vite resolution (fixes case/path issues in prod)
-import explorer from "~/public/images/explorer.svg";
-import painui from "~/public/images/painui.svg";
-import product from "~/public/images/product.svg";
-import ia from "~/public/images/ia.svg";
-
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
-
-function handleImageError(e: Event) {
-  const img = e.target as HTMLImageElement;
-  // 1) Try case-variant once
-  if (!img.dataset.fallbackTried) {
-    img.dataset.fallbackTried = "1";
-    const url = new URL(img.src);
-    const name = url.pathname.split("/").pop() || "";
-    const altCase = /[A-Z]/.test(name)
-      ? name.toLowerCase()
-      : name.toUpperCase();
-    const base = url.pathname.replace(name, "");
-    img.src = `${base}${altCase}`;
-    return;
-  }
-  // 2) Try swapping extension svg <-> png once
-  if (!img.dataset.extSwapTried) {
-    img.dataset.extSwapTried = "1";
-    try {
-      const url = new URL(img.src);
-      const parts = url.pathname.split("/");
-      const filename = parts.pop() || "";
-      const swapped = filename.endsWith(".svg")
-        ? filename.replace(/\.svg$/i, ".png")
-        : filename.replace(/\.png$/i, ".svg");
-      const base = parts.join("/");
-      img.src = `${base}/${swapped}`;
-      return;
-    } catch (_) {}
-  }
-  console.error("Imagem não encontrada:", img.src);
-}
-
-const props = withDefaults(defineProps<{}>(), {});
 
 const isInviteOpen = useState<boolean>("usabilityInviteOpen", () => false);
 

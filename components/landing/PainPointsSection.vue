@@ -33,11 +33,15 @@
           <div
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center mb-4"
           >
-            <img
-              :src="cemiterio"
+            <NuxtImg
+              src="/images/cemiterio.svg"
               alt="Ícone de cemitério"
               class="w-12 h-12"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -62,11 +66,15 @@
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center text-[#a78bfa] mb-4"
           >
             <!-- wave/marketing icon -->
-            <img
-              :src="marketing"
+            <NuxtImg
+              src="/images/marketing.svg"
               alt="Ícone de marketing"
               class="w-12 h-12"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -89,11 +97,15 @@
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center text-[#a78bfa] mb-4"
           >
             <!-- alert icon -->
-            <img
-              :src="vazio"
+            <NuxtImg
+              src="/images/vazio.svg"
               alt="Ícone de vazio"
               class="w-12 h-12"
-              @error="handleImageError"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -129,9 +141,5 @@
 </template>
 
 <script setup lang="ts">
-// Image paths
-const cemiterio = '/images/cemiterio.svg';
-const marketing = '/images/marketing.svg';
-const vazio = '/images/vazio.svg';
 // Componente de apresentação simples, sem props por enquanto.
 </script>

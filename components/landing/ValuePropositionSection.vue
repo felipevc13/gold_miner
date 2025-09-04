@@ -29,12 +29,16 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <img
-              :src="aim"
+            <NuxtImg
+              src="/images/aim.svg"
               alt="Ícone de mira"
               class="w-12 h-12"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
               aria-hidden="true"
-              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -53,12 +57,16 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <img
-              :src="code"
+            <NuxtImg
+              src="/images/code.svg"
               alt="Ícone de código"
               class="w-12 h-12"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
               aria-hidden="true"
-              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -76,12 +84,16 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <img
-              :src="launch"
+            <NuxtImg
+              src="/images/launch.svg"
               alt="Ícone de foguete"
               class="w-12 h-12"
+              loading="lazy"
+              format="webp"
+              quality="80"
+              width="48"
+              height="48"
               aria-hidden="true"
-              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -127,9 +139,5 @@
 </template>
 
 <script setup lang="ts">
-// Image paths
-const aim = '/images/aim.svg';
-const code = '/images/code.svg';
-const launch = '/images/launch.svg';
 // Componente de apresentação sem props por enquanto
 </script>

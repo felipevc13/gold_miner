@@ -46,17 +46,23 @@
         class="w-full mt-4 md:mt-auto flex justify-center px-4 sm:px-6 md:px-0"
       >
         <div class="w-full max-w-[1024px]">
-          <img
-            :src="explorerhero"
+          <NuxtImg
+            src="/images/explorerhero.svg"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
-            @error="handleImageError"
+            loading="lazy"
+            format="webp"
+            quality="80"
+            sizes="sm:100vw md:100vw lg:100vw"
           />
-          <img
-            :src="ui"
+          <NuxtImg
+            src="/images/ui.svg"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
-            @error="handleImageError"
+            loading="lazy"
+            format="webp"
+            quality="80"
+            sizes="sm:100vw md:100vw lg:100vw"
           />
         </div>
       </div>
@@ -74,10 +80,6 @@
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
 
-// Import images for Vite resolution (fixes case/path issues in prod)
-import explorerhero from "~/public/images/explorerhero.svg";
-import ui from "~/public/images/ui.svg";
-
 defineProps<{
   headline?: string;
   subheadline?: string;
@@ -89,40 +91,9 @@ const isInviteOpen = useState<boolean>("usabilityInviteOpen", () => false);
 function openModal() {
   isInviteOpen.value = true;
 }
+
 function onAcceptInvite() {
   // custom logic, e.g., redirect or analytics
   isInviteOpen.value = false;
-}
-
-function handleImageError(e: Event) {
-  const img = e.target as HTMLImageElement;
-  // 1) Try case-variant once (Linux FS is case-sensitive)
-  if (!img.dataset.fallbackTried) {
-    img.dataset.fallbackTried = "1";
-    const url = new URL(img.src);
-    const name = url.pathname.split("/").pop() || "";
-    const altCase = /[A-Z]/.test(name)
-      ? name.toLowerCase()
-      : name.toUpperCase();
-    const base = url.pathname.replace(name, "");
-    img.src = `${base}${altCase}`;
-    return;
-  }
-  // 2) Try swapping extension svg <-> png once
-  if (!img.dataset.extSwapTried) {
-    img.dataset.extSwapTried = "1";
-    try {
-      const url = new URL(img.src);
-      const parts = url.pathname.split("/");
-      const filename = parts.pop() || "";
-      const swapped = filename.endsWith(".svg")
-        ? filename.replace(/\.svg$/i, ".png")
-        : filename.replace(/\.png$/i, ".svg");
-      const base = parts.join("/");
-      img.src = `${base}/${swapped}`;
-      return;
-    } catch (_) {}
-  }
-  console.error("Imagem não encontrada:", img.src);
 }
 </script>

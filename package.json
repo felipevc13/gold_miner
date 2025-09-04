@@ -21,6 +21,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@nuxt/image": "^1.11.0",
     "@nuxt/kit": "^4.0.3",
     "@nuxt/schema": "^4.0.3",
     "@nuxt/types": "^2.18.1",

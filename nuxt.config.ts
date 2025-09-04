@@ -1,5 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 import svgLoader from "vite-svg-loader";
+import type { NuxtConfig } from '@nuxt/schema';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -201,7 +202,25 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vueuse/nuxt",
     "@nuxtjs/google-fonts",
+    "@nuxt/image"
   ],
+
+  // Image module configuration
+  image: {
+    // Options
+    dir: 'public/images',
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    format: ['webp'],
+    quality: 80,
+    provider: 'ipx'
+  },
 
   // Google Fonts configuration
   googleFonts: {
