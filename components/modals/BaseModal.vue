@@ -132,6 +132,23 @@
 <script setup lang="ts">
 import CloseIcon from "~/components/icon/CloseIcon.vue";
 
+// Debug function that works in production
+const debugLog = (...args: any[]) => {
+  if (process.client) {
+    console.log('[BaseModal]', ...args);
+    // Also log to window for easier access
+    const win = window as any;
+    if (!win.__modalDebugLogs) {
+      win.__modalDebugLogs = [];
+    }
+    win.__modalDebugLogs.push({
+      time: new Date().toISOString(),
+      message: args[0],
+      data: args.slice(1)
+    });
+  }
+};
+
 const props = defineProps({
   // Support multiple control APIs in ONE defineProps (avoid duplicate defineProps error)
   isOpen: { type: Boolean, default: undefined },
@@ -152,19 +169,39 @@ const props = defineProps({
   bodyClass: { type: String, default: "" },
 });
 
+const internalVisible = ref(false);
+
 const visible = computed<boolean>(() => {
-  // Priority: isOpen (canonical) -> open -> modelValue
-  if (typeof props.isOpen === "boolean") return props.isOpen as boolean;
-  if (typeof props.open === "boolean") return props.open as boolean;
-  if (typeof props.modelValue === "boolean") return props.modelValue as boolean;
-  return false;
+  const isVisible = 
+    props.isOpen ?? 
+    props.open ?? 
+    props.modelValue ?? 
+    internalVisible.value;
+  
+  // Log visibility changes
+  if (process.client) {
+    debugLog('Visibility changed', { 
+      isVisible,
+      props: {
+        isOpen: props.isOpen,
+        open: props.open,
+        modelValue: props.modelValue,
+        internalVisible: internalVisible.value
+      },
+      stack: new Error().stack
+    });
+  }
+  
+  return isVisible;
 });
 
 // Teleport target: use #modal-container if present (client), otherwise fallback to body
-const teleportTarget = ref<string>("body");
-onMounted(() => {
-  const host = document.getElementById("modal-container");
-  teleportTarget.value = host ? "#modal-container" : "body";
+const teleportTarget = computed(() => {
+  const target = props.teleportTo || 'body';
+  if (process.client) {
+    debugLog('Teleport target', { target, element: document.querySelector(target) });
+  }
+  return target;
 });
 
 // Declare both 'close' and 'save' so Vue won't warn when @save is used upstream
@@ -201,10 +238,12 @@ const modalSizeClass = computed(() => {
 
 // Modal close handlers
 function closeModal() {
-  emit("update:modelValue", false);
-  emit("update:open", false);
-  emit("update:isOpen", false);
-  emit("close");
+  debugLog('closeModal called');
+  internalVisible.value = false;
+  emit('update:isOpen', false);
+  emit('update:open', false);
+  emit('update:modelValue', false);
+  emit('close');
 }
 function handleBackdropClick() {
   if (props.closeOnBackdropClick) closeModal();
@@ -217,12 +256,39 @@ function handleEscKey(event: KeyboardEvent) {
 
 // Use Nuxt's auto-imported lifecycle hooks
 onMounted(() => {
+  debugLog('Modal mounted', { 
+    teleportTarget: teleportTarget.value,
+    documentBody: document.body ? 'body exists' : 'no body',
+    teleportTargetElement: document.querySelector(teleportTarget.value) ? 'teleport target exists' : 'no teleport target'
+  });
+  
   document.addEventListener("keydown", handleEscKey);
 });
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleEscKey);
 });
+
+// Watch for changes to the visible prop and update internal state
+watch(
+  () => props.isOpen ?? props.open ?? props.modelValue,
+  (newVal: boolean | undefined, oldVal: boolean | undefined) => {
+    debugLog('Prop change detected', { 
+      oldVal, 
+      newVal,
+      props: {
+        isOpen: props.isOpen,
+        open: props.open,
+        modelValue: props.modelValue
+      }
+    });
+    
+    if (newVal !== undefined) {
+      internalVisible.value = newVal;
+    }
+  },
+  { immediate: true }
+);
 
 // Focus trap: (simplificado, só volta foco pro modal se perder)
 watch(
