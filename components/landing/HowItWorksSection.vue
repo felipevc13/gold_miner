@@ -38,7 +38,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <explorer class="w-full h-auto block" />
+            <Explorer class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -89,7 +89,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <painui class="w-full h-auto block" />
+            <PainUi class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -131,7 +131,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <product class="w-full h-auto block" />
+            <Product class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -195,21 +195,25 @@
         </div>
       </div>
     </div>
-    <UsabilityTestInviteModal
-      v-model:open="isInviteOpen"
-      @accept="onAcceptInvite"
-      @cancel="isInviteOpen = false"
-    />
   </section>
+  <ClientOnly>
+    <Teleport to="body">
+      <UsabilityTestInviteModal
+        v-model:open="isInviteOpen"
+        @accept="onAcceptInvite"
+        @cancel="isInviteOpen = false"
+      />
+    </Teleport>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 // ref and onMounted are auto-imported by Nuxt 3
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
-import explorer from "~/components/images/explorer.vue";
-import painui from "~/components/images/painui.vue";
-import product from "~/components/images/product.vue";
+import Explorer from "~/components/images/explorer.vue";
+import PainUi from "~/components/images/painui.vue";
+import Product from "~/components/images/product.vue";
 import Ai from "~/components/icon/Ai.vue";
 
 // Use ref for client-side state
@@ -217,6 +221,10 @@ const isInviteOpen = ref(false);
 
 function openInvite() {
   isInviteOpen.value = true;
+}
+
+if (process.client) {
+  (window as any).__howItWorksOpenModal = () => (isInviteOpen.value = true);
 }
 
 function onAcceptInvite() {

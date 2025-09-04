@@ -46,26 +46,30 @@
         class="w-full mt-4 md:mt-auto flex justify-center px-4 sm:px-6 md:px-0"
       >
         <div class="w-full max-w-[1024px]">
-          <explorerhero class="w-full h-auto block md:hidden" />
-          <ui class="w-full h-auto hidden md:block" />
+          <ExplorerHero class="w-full h-auto block md:hidden" />
+          <Ui class="w-full h-auto hidden md:block" />
         </div>
       </div>
     </div>
-
-    <UsabilityTestInviteModal
-      v-model:open="isInviteOpen"
-      @accept="onAcceptInvite"
-      @cancel="isInviteOpen = false"
-    />
   </section>
+
+  <ClientOnly>
+    <Teleport to="body">
+      <UsabilityTestInviteModal
+        v-model:open="isInviteOpen"
+        @accept="onAcceptInvite"
+        @cancel="isInviteOpen = false"
+      />
+    </Teleport>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 // ref and onMounted are auto-imported by Nuxt 3
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
-import ui from "~/components/images/ui.vue";
-import explorerhero from "~/components/images/explorerhero.vue";
+import Ui from "~/components/images/ui.vue";
+import ExplorerHero from "~/components/images/explorerhero.vue";
 
 defineProps<{
   headline?: string;
@@ -78,6 +82,11 @@ const isInviteOpen = ref(false);
 
 function openModal() {
   isInviteOpen.value = true;
+}
+
+if (process.client) {
+  // debug: helps verify the click handler runs in production
+  (window as any).__heroOpenModal = () => (isInviteOpen.value = true);
 }
 
 function onAcceptInvite() {
