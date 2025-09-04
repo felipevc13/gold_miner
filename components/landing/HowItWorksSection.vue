@@ -39,7 +39,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/explorer.svg"
+              :src="'/images/explorer.svg'"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -95,7 +95,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/painui.svg"
+              :src="'/images/painui.svg'"
               alt="Screenshot Dores"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -142,7 +142,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/product.svg"
+              :src="'/images/product.svg'"
               alt="Screenshot product"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -194,7 +194,7 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                src="/images/ia.svg"
+                :src="'/images/ia.svg'"
                 alt="Ícone de IA"
                 class="w-12 h-12"
                 @error="handleImageError"
@@ -229,6 +229,7 @@ import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteMod
 
 function handleImageError(e: Event) {
   const img = e.target as HTMLImageElement;
+  // 1) Try case-variant once
   if (!img.dataset.fallbackTried) {
     img.dataset.fallbackTried = "1";
     const url = new URL(img.src);
@@ -239,6 +240,21 @@ function handleImageError(e: Event) {
     const base = url.pathname.replace(name, "");
     img.src = `${base}${altCase}`;
     return;
+  }
+  // 2) Try swapping extension svg <-> png once
+  if (!img.dataset.extSwapTried) {
+    img.dataset.extSwapTried = "1";
+    try {
+      const url = new URL(img.src);
+      const parts = url.pathname.split("/");
+      const filename = parts.pop() || "";
+      const swapped = filename.endsWith(".svg")
+        ? filename.replace(/\.svg$/i, ".png")
+        : filename.replace(/\.png$/i, ".svg");
+      const base = parts.join("/");
+      img.src = `${base}/${swapped}`;
+      return;
+    } catch (_) {}
   }
   console.error("Imagem não encontrada:", img.src);
 }

@@ -47,13 +47,13 @@
       >
         <div class="w-full max-w-[1024px]">
           <img
-            src="/images/explorerhero.svg"
+            :src="'/images/explorerhero.svg'"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
             @error="handleImageError"
           />
           <img
-            src="/images/ui.svg"
+            :src="'/images/ui.svg'"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
             @error="handleImageError"
@@ -92,6 +92,7 @@ function onAcceptInvite() {
 
 function handleImageError(e: Event) {
   const img = e.target as HTMLImageElement;
+  // 1) Try case-variant once (Linux FS is case-sensitive)
   if (!img.dataset.fallbackTried) {
     img.dataset.fallbackTried = "1";
     const url = new URL(img.src);
@@ -102,6 +103,21 @@ function handleImageError(e: Event) {
     const base = url.pathname.replace(name, "");
     img.src = `${base}${altCase}`;
     return;
+  }
+  // 2) Try swapping extension svg <-> png once
+  if (!img.dataset.extSwapTried) {
+    img.dataset.extSwapTried = "1";
+    try {
+      const url = new URL(img.src);
+      const parts = url.pathname.split("/");
+      const filename = parts.pop() || "";
+      const swapped = filename.endsWith(".svg")
+        ? filename.replace(/\.svg$/i, ".png")
+        : filename.replace(/\.png$/i, ".svg");
+      const base = parts.join("/");
+      img.src = `${base}/${swapped}`;
+      return;
+    } catch (_) {}
   }
   console.error("Imagem não encontrada:", img.src);
 }

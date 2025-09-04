@@ -4,10 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "copy:assets": "mkdir -p public/images && cp -r assets/images/* public/images/",
-    "build": "npm run copy:assets && nuxt build",
+    "build": "nuxt build",
     "dev": "nuxt dev",
-    "generate": "npm run copy:assets && nuxt generate",
+    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
