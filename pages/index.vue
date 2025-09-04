@@ -17,10 +17,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: "default",
-  ssr: false, // renderiza só no cliente
-});
 // Usando require para garantir que o caminho seja resolvido corretamente
 
 import Logo from "~/components/icon/Logo.vue";
