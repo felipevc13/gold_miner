@@ -2,8 +2,8 @@
   <Teleport :to="teleportTarget">
     <Transition name="modal-fade">
       <div
-        v-if="isOpen"
-        class="fixed inset-0 z-[30] flex items-center justify-center p-6 bg-black bg-opacity-70"
+        v-if="visible"
+        class="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-black bg-opacity-70"
         @click.self="handleBackdropClick"
         role="dialog"
         aria-modal="true"
@@ -148,6 +148,21 @@ const props = defineProps({
   bodyClass: { type: String, default: "" },
 });
 
+// Support alternate APIs (open/modelValue) for broader compatibility
+const optional = defineProps({
+  open: { type: Boolean, default: undefined },
+  modelValue: { type: Boolean, default: undefined },
+});
+
+const visible = computed<boolean>(() => {
+  // Priority: isOpen (canonical) -> open -> modelValue
+  if (typeof props.isOpen === "boolean") return props.isOpen;
+  if (typeof optional.open === "boolean") return optional.open as boolean;
+  if (typeof optional.modelValue === "boolean")
+    return optional.modelValue as boolean;
+  return false;
+});
+
 // Teleport target: use #modal-container if present (client), otherwise fallback to body
 const teleportTarget = ref<string>("body");
 onMounted(() => {
@@ -156,7 +171,13 @@ onMounted(() => {
 });
 
 // Declare both 'close' and 'save' so Vue won't warn when @save is used upstream
-const emit = defineEmits(["close", "save"]);
+const emit = defineEmits([
+  "close",
+  "save",
+  "update:modelValue",
+  "update:open",
+  "update:isOpen",
+]);
 
 const modalContentRef = ref<HTMLElement | null>(null);
 
@@ -183,6 +204,9 @@ const modalSizeClass = computed(() => {
 
 // Modal close handlers
 function closeModal() {
+  emit("update:modelValue", false);
+  emit("update:open", false);
+  emit("update:isOpen", false);
   emit("close");
 }
 function handleBackdropClick() {

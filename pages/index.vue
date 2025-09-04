@@ -11,6 +11,8 @@
       <ValuePropositionSection />
       <HowItWorksSection />
     </main>
+    <!-- Global modal portal (used by BaseModal when available) -->
+    <div id="modal-container" class="relative z-[20000]"></div>
   </div>
 </template>
 
