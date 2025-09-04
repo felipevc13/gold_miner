@@ -34,9 +34,10 @@
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center mb-4"
           >
             <img
-              src="/images/cemiterio.svg"
+              src="/cemiterio.svg"
               alt="Ícone de cemitério"
               class="w-12 h-12"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -62,9 +63,10 @@
           >
             <!-- wave/marketing icon -->
             <img
-              src="/images/marketing.svg"
+              src="/marketing.svg"
               alt="Ícone de marketing"
               class="w-12 h-12"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -88,9 +90,10 @@
           >
             <!-- alert icon -->
             <img
-              src="/images/vazio.svg"
+              src="/vazio.svg"
               alt="Ícone de vazio"
               class="w-12 h-12"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">

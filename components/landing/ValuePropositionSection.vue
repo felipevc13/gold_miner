@@ -30,10 +30,11 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/images/aim.svg"
+              src="/aim.svg"
               alt="Ícone de mira"
               class="w-12 h-12"
               aria-hidden="true"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -53,10 +54,11 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/images/code.svg"
+              src="/code.svg"
               alt="Ícone de código"
               class="w-12 h-12"
               aria-hidden="true"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
@@ -75,10 +77,11 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/images/launch.svg"
+              src="/launch.svg"
               alt="Ícone de foguete"
               class="w-12 h-12"
               aria-hidden="true"
+              @error="handleImageError"
             />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
