@@ -1,0 +1,15 @@
+# Cache directories
+.cache/
+tmp/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+
+# Exclude large directories
+components/icon/
+components/images/
+public/

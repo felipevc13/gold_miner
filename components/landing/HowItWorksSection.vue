@@ -227,36 +227,24 @@ import Ai from "~/components/icon/Ai.vue";
 
 // Use ref for client-side state
 const isInviteOpen = ref(false);
-const isMounted = ref(false);
-
-// Only render modal after mount
+// Debug helper for development
 onMounted(() => {
-  isMounted.value = true;
-
-  // Debug helper
-  if (process.client) {
+  if (process.dev) {
     (window as any).__howItWorksOpenModal = () => {
       isInviteOpen.value = true;
       return "Modal opened";
     };
-    console.log("HowItWorksSection mounted, modal can be opened");
   }
 });
 
 function openInvite(event: Event) {
-  if (process.client) {
-    event?.preventDefault();
-    event?.stopPropagation();
-    console.log("Opening modal, isMounted:", isMounted.value);
-    isInviteOpen.value = true;
-  }
+  event?.preventDefault();
+  event?.stopPropagation();
+  isInviteOpen.value = true;
 }
 
 function onAcceptInvite() {
-  if (process.client) {
-    // Open Useberry test in a new tab
-    window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
-    isInviteOpen.value = false;
-  }
+  window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
+  isInviteOpen.value = false;
 }
 </script>

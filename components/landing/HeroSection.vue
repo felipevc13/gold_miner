@@ -87,34 +87,22 @@ defineProps<{
 
 // Use ref for client-side state
 const isInviteOpen = ref(false);
-const isMounted = ref(false);
-
-// Only render modal after mount
+// Debug helper for development
 onMounted(() => {
-  isMounted.value = true;
-
-  // Debug helper
-  if (process.client) {
+  if (process.dev) {
     (window as any).__heroOpenModal = () => {
       isInviteOpen.value = true;
       return "Modal opened";
     };
-    console.log("HeroSection mounted, modal can be opened");
   }
 });
 
 function openModal() {
-  if (process.client) {
-    console.log("Opening modal, isMounted:", isMounted.value);
-    isInviteOpen.value = true;
-  }
+  isInviteOpen.value = true;
 }
 
 function onAcceptInvite() {
-  if (process.client) {
-    // Open Useberry test in a new tab
-    window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
-    isInviteOpen.value = false;
-  }
+  window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
+  isInviteOpen.value = false;
 }
 </script>
