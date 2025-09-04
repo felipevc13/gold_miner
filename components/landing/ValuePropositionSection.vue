@@ -30,7 +30,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/aim.svg"
+              :src="aim"
               alt="Ícone de mira"
               class="w-12 h-12"
               aria-hidden="true"
@@ -54,7 +54,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/code.svg"
+              :src="code"
               alt="Ícone de código"
               class="w-12 h-12"
               aria-hidden="true"
@@ -77,7 +77,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="/launch.svg"
+              :src="launch"
               alt="Ícone de foguete"
               class="w-12 h-12"
               aria-hidden="true"
@@ -127,5 +127,9 @@
 </template>
 
 <script setup lang="ts">
+// Image paths
+const aim = '/images/aim.svg';
+const code = '/images/code.svg';
+const launch = '/images/launch.svg';
 // Componente de apresentação sem props por enquanto
 </script>

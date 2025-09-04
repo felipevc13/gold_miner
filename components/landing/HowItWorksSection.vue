@@ -39,7 +39,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="'/explorer.svg'"
+              :src="explorer"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -95,7 +95,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="'/painui.svg'"
+              :src="painui"
               alt="Screenshot Dores"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -142,7 +142,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              :src="'/product.svg'"
+              :src="product"
               alt="Screenshot product"
               class="w-full h-auto block"
               @error="handleImageError"
@@ -194,7 +194,7 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                :src="'/IA.svg'"
+                :src="ia"
                 alt="Ícone de IA"
                 class="w-12 h-12"
                 @error="handleImageError"
@@ -224,6 +224,12 @@
 </template>
 
 <script setup lang="ts">
+// Import images for Vite resolution (fixes case/path issues in prod)
+import explorer from "~/public/images/explorer.svg";
+import painui from "~/public/images/painui.svg";
+import product from "~/public/images/product.svg";
+import ia from "~/public/images/ia.svg";
+
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
 

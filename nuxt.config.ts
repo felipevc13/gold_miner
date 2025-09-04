@@ -1,4 +1,5 @@
 import { defineNuxtConfig } from "nuxt/config";
+import svgLoader from "vite-svg-loader";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -118,6 +119,11 @@ export default defineNuxtConfig({
 
   // Pinia configuration is handled by @pinia/nuxt module
 
+  // Build configuration
+  build: {
+    transpile: [],
+  },
+
   // Vite configuration
   vite: {
     define: {
@@ -126,6 +132,10 @@ export default defineNuxtConfig({
         process.env.NODE_ENV || "development"
       ),
     },
+    plugins: [
+      svgLoader({ defaultImport: "url" }), // Configured to treat as URL for static <img>
+    ],
+    // Removed unnecessary alias for ~/public
     optimizeDeps: {
       include: [
         "vue",
@@ -174,18 +184,6 @@ export default defineNuxtConfig({
         propsDestructure: true,
       },
     },
-    plugins: [
-      {
-        name: "disable-vue-tsc",
-        config: () => ({
-          build: {
-            rollupOptions: {
-              external: ["vite-plugin-checker"],
-            },
-          },
-        }),
-      },
-    ],
   },
 
   // Global CSS
@@ -194,15 +192,15 @@ export default defineNuxtConfig({
   // Modules
   modules: [
     "@nuxtjs/tailwindcss",
-    "@nuxtjs/supabase",
-    "@vueuse/nuxt",
-    "@nuxtjs/google-fonts",
     [
       "@pinia/nuxt",
       {
         autoImports: ["defineStore", "storeToRefs", "acceptHMRUpdate"],
       },
     ],
+    "@nuxtjs/supabase",
+    "@vueuse/nuxt",
+    "@nuxtjs/google-fonts",
   ],
 
   // Google Fonts configuration

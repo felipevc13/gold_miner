@@ -34,7 +34,7 @@
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center mb-4"
           >
             <img
-              src="/cemiterio.svg"
+              :src="cemiterio"
               alt="Ícone de cemitério"
               class="w-12 h-12"
               @error="handleImageError"
@@ -63,7 +63,7 @@
           >
             <!-- wave/marketing icon -->
             <img
-              src="/marketing.svg"
+              :src="marketing"
               alt="Ícone de marketing"
               class="w-12 h-12"
               @error="handleImageError"
@@ -90,7 +90,7 @@
           >
             <!-- alert icon -->
             <img
-              src="/vazio.svg"
+              :src="vazio"
               alt="Ícone de vazio"
               class="w-12 h-12"
               @error="handleImageError"
@@ -129,5 +129,9 @@
 </template>
 
 <script setup lang="ts">
+// Image paths
+const cemiterio = '/images/cemiterio.svg';
+const marketing = '/images/marketing.svg';
+const vazio = '/images/vazio.svg';
 // Componente de apresentação simples, sem props por enquanto.
 </script>

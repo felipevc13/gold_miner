@@ -47,13 +47,13 @@
       >
         <div class="w-full max-w-[1024px]">
           <img
-            :src="'/explorerhero.svg'"
+            :src="explorerhero"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
             @error="handleImageError"
           />
           <img
-            :src="'/ui.svg'"
+            :src="ui"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
             @error="handleImageError"
@@ -73,6 +73,10 @@
 <script setup lang="ts">
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
+
+// Import images for Vite resolution (fixes case/path issues in prod)
+import explorerhero from "~/public/images/explorerhero.svg";
+import ui from "~/public/images/ui.svg";
 
 defineProps<{
   headline?: string;
