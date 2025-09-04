@@ -60,7 +60,7 @@ const handleRegister = async () => {
       class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
     >
       <div class="flex items-center justify-center mb-6">
-        <Logo class="h-14" />
+        <Logo class="h-8" />
       </div>
       <form @submit.prevent="handleRegister" class="space-y-4">
         <div>
