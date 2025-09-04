@@ -133,7 +133,11 @@
 import CloseIcon from "~/components/icon/CloseIcon.vue";
 
 const props = defineProps({
-  isOpen: { type: Boolean, required: true },
+  // Support multiple control APIs in ONE defineProps (avoid duplicate defineProps error)
+  isOpen: { type: Boolean, default: undefined },
+  open: { type: Boolean, default: undefined },
+  modelValue: { type: Boolean, default: undefined },
+
   title: { type: String, default: "" },
   size: { type: String, default: "viewport-fill" },
   closeOnBackdropClick: { type: Boolean, default: true },
@@ -148,18 +152,11 @@ const props = defineProps({
   bodyClass: { type: String, default: "" },
 });
 
-// Support alternate APIs (open/modelValue) for broader compatibility
-const optional = defineProps({
-  open: { type: Boolean, default: undefined },
-  modelValue: { type: Boolean, default: undefined },
-});
-
 const visible = computed<boolean>(() => {
   // Priority: isOpen (canonical) -> open -> modelValue
-  if (typeof props.isOpen === "boolean") return props.isOpen;
-  if (typeof optional.open === "boolean") return optional.open as boolean;
-  if (typeof optional.modelValue === "boolean")
-    return optional.modelValue as boolean;
+  if (typeof props.isOpen === "boolean") return props.isOpen as boolean;
+  if (typeof props.open === "boolean") return props.open as boolean;
+  if (typeof props.modelValue === "boolean") return props.modelValue as boolean;
   return false;
 });
 
@@ -227,9 +224,9 @@ onUnmounted(() => {
 
 // Focus trap: (simplificado, só volta foco pro modal se perder)
 watch(
-  () => props.isOpen,
-  (open: boolean) => {
-    if (open) setTimeout(() => modalContentRef.value?.focus(), 100);
+  () => visible.value,
+  (isVisible: boolean) => {
+    if (isVisible) setTimeout(() => modalContentRef.value?.focus(), 100);
   }
 );
 </script>
