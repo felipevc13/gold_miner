@@ -47,12 +47,12 @@
       >
         <div class="w-full max-w-[1024px]">
           <img
-            :src="'/images/explorerhero.svg'"
+            :src="explorerHeroUrl"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
           />
           <img
-            :src="'/images/ui.svg'"
+            :src="uiPreviewUrl"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
           />
@@ -71,6 +71,8 @@
 <script setup lang="ts">
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
+import explorerHeroUrl from "~/assets/images/explorerhero.svg";
+import uiPreviewUrl from "~/assets/images/ui.svg";
 
 defineProps<{
   headline?: string;

@@ -54,7 +54,8 @@ export default defineNuxtConfig({
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
-          content: "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
         },
         { name: "robots", content: "index,follow" },
         { name: "theme-color", content: "#0F0F12" },
@@ -68,7 +69,8 @@ export default defineNuxtConfig({
         },
         {
           property: "og:description",
-          content: "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
         },
         {
           property: "og:url",
@@ -85,25 +87,26 @@ export default defineNuxtConfig({
         },
         {
           name: "twitter:description",
-          content: "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
+          content:
+            "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
         },
-        { name: "twitter:image", content: "/og.jpg" }
+        { name: "twitter:image", content: "/og.jpg" },
       ],
       link: [
         {
           rel: "canonical",
           href: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
         },
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" }
-      ]
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      ],
     },
   },
 
   // Static assets configuration
   nitro: {
-    static: true
+    static: true,
   },
-  
+
   // Vue configuration
   vue: {
     compilerOptions: {

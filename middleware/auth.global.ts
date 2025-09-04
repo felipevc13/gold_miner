@@ -1,9 +1,8 @@
 // Import directly from Nuxt 3 packages
-import { navigateTo, defineNuxtRouteMiddleware } from '#app';
-import { useSupabaseClient } from '#imports';
+import { navigateTo, defineNuxtRouteMiddleware } from "#app";
+import { useSupabaseClient } from "#imports";
 
 export default defineNuxtRouteMiddleware(async (to, _from) => {
-
   // Páginas que não exigem login
   const publicPages = ["/", "/login", "/register"];
 

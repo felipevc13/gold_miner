@@ -39,9 +39,10 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/explorer.svg"
+              :src="explorerImgUrl"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
+              @error="handleImageError"
             />
           </div>
         </div>
@@ -94,9 +95,10 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/painui.svg"
+              :src="painUiImgUrl"
               alt="Screenshot Dores"
               class="w-full h-auto block"
+              @error="handleImageError"
             />
           </div>
         </div>
@@ -140,9 +142,10 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="/images/product.svg"
+              :src="productImgUrl"
               alt="Screenshot product"
               class="w-full h-auto block"
+              @error="handleImageError"
             />
           </div>
         </div>
@@ -191,9 +194,10 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                src="/images/IA.svg"
+                :src="iaIconUrl"
                 alt="Ícone de IA"
                 class="w-12 h-12"
+                @error="handleImageError"
               />
             </div>
             <h4 class="text-white text-2xl md:text-3xl font-extrabold mb-2">
@@ -222,6 +226,10 @@
 <script setup lang="ts">
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
+import explorerImgUrl from "~/assets/images/explorer.svg";
+import painUiImgUrl from "~/assets/images/painui.svg";
+import productImgUrl from "~/assets/images/product.svg";
+import iaIconUrl from "~/assets/images/IA.svg";
 
 const handleImageError = (e: Event) => {
   console.error(
