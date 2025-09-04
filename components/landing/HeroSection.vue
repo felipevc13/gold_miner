@@ -34,7 +34,13 @@
             <Button
               data-test="cta-open-modal"
               class="w-full sm:!w-auto justify-center pointer-events-auto"
-              @click.stop="openModal"
+              @click="openModal"
+              @keydown.enter="openModal"
+              @keydown.space.prevent="(e: KeyboardEvent) => openModal(e)"
+              role="button"
+              tabindex="0"
+              aria-haspopup="dialog"
+              :aria-expanded="isInviteOpen"
             >
               {{
                 ctaText ||
@@ -83,24 +89,34 @@ defineProps<{
 
 // Use ref for client-side state
 const isInviteOpen = ref(false);
+const isMounted = ref(false);
+
+// Only render modal after mount
+onMounted(() => {
+  isMounted.value = true;
+  
+  // Debug helper
+  if (process.client) {
+    (window as any).__heroOpenModal = () => {
+      isInviteOpen.value = true;
+      return 'Modal opened';
+    };
+    console.log('HeroSection mounted, modal can be opened');
+  }
+});
 
 function openModal() {
-  isInviteOpen.value = true;
-}
-
-if (process.client) {
-  // debug: helps verify the click handler runs in production
-  (window as any).__heroOpenModal = () => (isInviteOpen.value = true);
+  if (process.client) {
+    console.log('Opening modal, isMounted:', isMounted.value);
+    isInviteOpen.value = true;
+  }
 }
 
 function onAcceptInvite() {
-  // Open Useberry test in a new tab
-  window.open('https://app.useberry.com/t/8p6kNDLt1N86VD/', '_blank');
-  isInviteOpen.value = false;
+  if (process.client) {
+    // Open Useberry test in a new tab
+    window.open('https://app.useberry.com/t/8p6kNDLt1N86VD/', '_blank');
+    isInviteOpen.value = false;
+  }
 }
-
-// Ensure proper hydration on client
-onMounted(() => {
-  // Any client-side initialization if needed
-});
 </script>
