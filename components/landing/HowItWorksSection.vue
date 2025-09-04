@@ -194,7 +194,7 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                :src="'/images/ia.svg'"
+                :src="'/images/IA.svg'"
                 alt="Ícone de IA"
                 class="w-12 h-12"
                 @error="handleImageError"
