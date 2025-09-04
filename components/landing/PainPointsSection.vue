@@ -34,7 +34,7 @@
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center mb-4"
           >
             <img
-              src="~/assets/images/cemiterio.svg"
+              src="/images/cemiterio.svg"
               alt="Ícone de cemitério"
               class="w-12 h-12"
             />
@@ -62,7 +62,7 @@
           >
             <!-- wave/marketing icon -->
             <img
-              src="~/assets/images/marketing.svg"
+              src="/images/marketing.svg"
               alt="Ícone de marketing"
               class="w-12 h-12"
             />
@@ -88,7 +88,7 @@
           >
             <!-- alert icon -->
             <img
-              src="~/assets/images/vazio.svg"
+              src="/images/vazio.svg"
               alt="Ícone de vazio"
               class="w-12 h-12"
             />

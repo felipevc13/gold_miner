@@ -39,7 +39,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="~/assets/images/explorer.svg"
+              src="/images/explorer.svg"
               alt="Screenshot Explorer"
               class="w-full h-auto block"
             />
@@ -94,7 +94,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="~/assets/images/painui.svg"
+              src="/images/painui.svg"
               alt="Screenshot Dores"
               class="w-full h-auto block"
             />
@@ -140,7 +140,7 @@
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
             <img
-              src="~/assets/images/product.svg"
+              src="/images/product.svg"
               alt="Screenshot product"
               class="w-full h-auto block"
             />
@@ -191,7 +191,7 @@
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
               <img
-                src="~/assets/images/IA.svg"
+                src="/images/IA.svg"
                 alt="Ícone de IA"
                 class="w-12 h-12"
               />

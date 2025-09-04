@@ -30,7 +30,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="~/assets/images/aim.svg"
+              src="/images/aim.svg"
               alt="Ícone de mira"
               class="w-12 h-12"
               aria-hidden="true"
@@ -53,7 +53,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="~/assets/images/code.svg"
+              src="/images/code.svg"
               alt="Ícone de código"
               class="w-12 h-12"
               aria-hidden="true"
@@ -75,7 +75,7 @@
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
             <img
-              src="~/assets/images/launch.svg"
+              src="/images/launch.svg"
               alt="Ícone de foguete"
               class="w-12 h-12"
               aria-hidden="true"

@@ -47,12 +47,12 @@
       >
         <div class="w-full max-w-[1024px]">
           <img
-            src="~/assets/images/explorerhero.svg"
+            :src="'/images/explorerhero.svg'"
             alt="Gold Miner Dashboard Mobile Preview"
             class="w-full h-auto block md:hidden"
           />
           <img
-            src="~/assets/images/ui.svg"
+            :src="'/images/ui.svg'"
             alt="Gold Miner Dashboard Preview"
             class="w-full h-auto hidden md:block"
           />
