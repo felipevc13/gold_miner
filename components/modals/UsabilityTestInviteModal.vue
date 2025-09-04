@@ -2,9 +2,12 @@
   <!-- Wrapper over BaseModal; supports multiple common v-model patterns -->
   <BaseModal
     :isOpen="open"
+    :open="open"
     :modelValue="open"
     size="lg"
     :bodyClass="'p-6 md:p-8 space-y-4 leading-relaxed text-gray-200'"
+    @update:modelValue="(v:boolean)=> (open = v)"
+    @update:open="(v:boolean)=> (open = v)"
     @close="onCancel"
   >
     <!-- HEADER -->
@@ -76,29 +79,33 @@
 </template>
 
 <script setup lang="ts">
-// NOTE: Ajuste o import abaixo conforme o caminho real do seu BaseModal
 import Button from "~/components/ui/Button.vue";
 import BaseModal from "~/components/modals/BaseModal.vue";
 
-/**
- * Props & Emits
- * - `open`: controla a visibilidade a partir do pai (v-model:open)
- * - Emite: `update:open`, `accept`, `cancel`
- */
-const props = defineProps<{ open: boolean }>();
+// Unified model that works with v-model:open no pai
+const open = defineModel<boolean>("open", { default: false });
+
 const emit = defineEmits<{
-  (e: "update:open", value: boolean): void;
   (e: "accept"): void;
   (e: "cancel"): void;
 }>();
 
+function close() {
+  open.value = false;
+}
 function onAccept() {
   emit("accept");
+  close();
 }
-
 function onCancel() {
   emit("cancel");
-  emit("update:open", false);
+  close();
+}
+
+// Expose for quick prod debug if needed
+if (process.client) {
+  // @ts-ignore
+  window.__usabilityInviteSetOpen = (v: boolean) => (open.value = !!v);
 }
 </script>
 
