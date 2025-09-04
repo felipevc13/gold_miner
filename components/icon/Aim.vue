@@ -1,0 +1,45 @@
+<template>
+  <svg
+    width="81"
+    height="80"
+    viewBox="0 0 81 80"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect
+      x="0.329956"
+      width="80"
+      height="80"
+      rx="40"
+      fill="#8E6CE4"
+      fill-opacity="0.2"
+    />
+    <path
+      d="M40.33 56.6673C49.5347 56.6673 56.9967 49.2054 56.9967 40.0007C56.9967 30.7959 49.5347 23.334 40.33 23.334C31.1253 23.334 23.6633 30.7959 23.6633 40.0007C23.6633 49.2054 31.1253 56.6673 40.33 56.6673Z"
+      stroke="#8E6CE4"
+      stroke-width="3.33333"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M40.33 50C45.8528 50 50.33 45.5228 50.33 40C50.33 34.4772 45.8528 30 40.33 30C34.8071 30 30.33 34.4772 30.33 40C30.33 45.5228 34.8071 50 40.33 50Z"
+      stroke="#8E6CE4"
+      stroke-width="3.33333"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M40.3299 43.3327C42.1709 43.3327 43.6632 41.8403 43.6632 39.9993C43.6632 38.1584 42.1709 36.666 40.3299 36.666C38.489 36.666 36.9966 38.1584 36.9966 39.9993C36.9966 41.8403 38.489 43.3327 40.3299 43.3327Z"
+      stroke="#8E6CE4"
+      stroke-width="3.33333"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</template>
+
+<script>
+export default {
+  name: "Aim",
+};
+</script>

@@ -46,24 +46,8 @@
         class="w-full mt-4 md:mt-auto flex justify-center px-4 sm:px-6 md:px-0"
       >
         <div class="w-full max-w-[1024px]">
-          <NuxtImg
-            src="/images/explorerhero.svg"
-            alt="Gold Miner Dashboard Mobile Preview"
-            class="w-full h-auto block md:hidden"
-            loading="lazy"
-            format="webp"
-            quality="80"
-            sizes="sm:100vw md:100vw lg:100vw"
-          />
-          <NuxtImg
-            src="/images/ui.svg"
-            alt="Gold Miner Dashboard Preview"
-            class="w-full h-auto hidden md:block"
-            loading="lazy"
-            format="webp"
-            quality="80"
-            sizes="sm:100vw md:100vw lg:100vw"
-          />
+          <explorerhero class="w-full h-auto block md:hidden" />
+          <ui class="w-full h-auto hidden md:block" />
         </div>
       </div>
     </div>
@@ -79,6 +63,8 @@
 <script setup lang="ts">
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
+import ui from "~/components/images/ui.vue";
+import explorerhero from "~/components/images/explorerhero.vue";
 
 defineProps<{
   headline?: string;

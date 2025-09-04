@@ -1,5 +1,4 @@
 {
-  // ESTE ARQUIVO É GERENCIADO PELO NUXT. NÃO EDITE DIRETAMENTE.
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "bundler",
@@ -14,11 +13,10 @@
       "~/*": ["./*"],
       "@/*": ["./*"]
     },
-    // Garante que o Volar (extensão do VS Code) entenda o ambiente Nuxt
-    "types": ["nuxt/schema"]
+    "types": ["node", "vite/client", "vue", "@pinia/nuxt", "nuxt/schema"]
   },
-  // Inclui todos os arquivos necessários para o Nuxt entender seu projeto
   "include": [
+    ".nuxt/types/**/*.ts",
     "**/*.ts",
     "**/*.d.ts",
     "**/*.tsx",

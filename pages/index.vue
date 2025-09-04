@@ -4,10 +4,7 @@
     <main class="w-full mx-auto pt-20">
       <div class="flex items-center w-full justify-center gap-2">
         <!-- Substitua pelo componente/logo real caso exista -->
-        <Logo class="w-12 h-12" />
-        <span class="text-4xl font-light text-white font-['JetBrains_Mono']"
-          >Gold Miner</span
-        >
+        <Logo class="h-14" />
       </div>
       <HeroSection />
       <PainPointsSection />

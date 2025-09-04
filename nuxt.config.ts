@@ -1,8 +1,6 @@
-import { defineNuxtConfig } from "nuxt/config";
-import svgLoader from "vite-svg-loader";
-import type { NuxtConfig } from '@nuxt/schema';
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { defineNuxtConfig } from "nuxt/config";
+
 export default defineNuxtConfig({
   // TypeScript configuration
   typescript: {
@@ -28,7 +26,7 @@ export default defineNuxtConfig({
           "~/*": ["./*"],
           "@/*": ["./*"],
         },
-        types: ["@pinia/nuxt", "vite/client", "vue", "nuxt/schema"],
+        types: ["@pinia/nuxt", "vite/client", "vue", "nuxt/schema", "node"],
       },
       include: [
         "**/*.ts",
@@ -107,6 +105,7 @@ export default defineNuxtConfig({
   // Static assets configuration
   nitro: {
     static: true,
+    compatibilityDate: "2025-09-04",
   },
 
   // Vue configuration
@@ -133,9 +132,6 @@ export default defineNuxtConfig({
         process.env.NODE_ENV || "development"
       ),
     },
-    plugins: [
-      svgLoader({ defaultImport: "url" }), // Configured to treat as URL for static <img>
-    ],
     // Removed unnecessary alias for ~/public
     optimizeDeps: {
       include: [
@@ -202,13 +198,12 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vueuse/nuxt",
     "@nuxtjs/google-fonts",
-    "@nuxt/image"
+    "@nuxt/image",
   ],
 
   // Image module configuration
   image: {
-    // Options
-    dir: 'public/images',
+    dir: "public/images",
     screens: {
       xs: 320,
       sm: 640,
@@ -217,9 +212,12 @@ export default defineNuxtConfig({
       xl: 1280,
       xxl: 1536,
     },
-    format: ['webp'],
-    quality: 80,
-    provider: 'ipx'
+    provider: "ipx",
+    presets: {
+      raster: {
+        modifiers: { format: "webp", quality: 80 },
+      },
+    },
   },
 
   // Google Fonts configuration

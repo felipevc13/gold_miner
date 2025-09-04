@@ -29,17 +29,7 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <NuxtImg
-              src="/images/aim.svg"
-              alt="Ícone de mira"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-              aria-hidden="true"
-            />
+            <Aim class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             Clareza Estratégica Absoluta
@@ -57,17 +47,7 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <NuxtImg
-              src="/images/code.svg"
-              alt="Ícone de código"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-              aria-hidden="true"
-            />
+            <Code class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             Foco no que Você Ama
@@ -84,17 +64,7 @@
           <div
             class="mx-auto mb-5 w-12 h-12 rounded-full bg-[#231f33] text-[#a78bfa] flex items-center justify-center"
           >
-            <NuxtImg
-              src="/images/launch.svg"
-              alt="Ícone de foguete"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-              aria-hidden="true"
-            />
+            <Launch class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             Lançamento em Dias, Não Meses
@@ -139,5 +109,8 @@
 </template>
 
 <script setup lang="ts">
+import Aim from "~/components/icon/Aim.vue";
+import Code from "~/components/icon/Code.vue";
+import Launch from "~/components/icon/Launch.vue";
 // Componente de apresentação sem props por enquanto
 </script>

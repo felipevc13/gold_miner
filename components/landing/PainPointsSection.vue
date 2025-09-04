@@ -33,16 +33,7 @@
           <div
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center mb-4"
           >
-            <NuxtImg
-              src="/images/cemiterio.svg"
-              alt="Ícone de cemitério"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-            />
+            <Cemiterio class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             O Cemitério de Ideias
@@ -65,17 +56,7 @@
           <div
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center text-[#a78bfa] mb-4"
           >
-            <!-- wave/marketing icon -->
-            <NuxtImg
-              src="/images/marketing.svg"
-              alt="Ícone de marketing"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-            />
+            <Marketing class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             O Abismo do Marketing
@@ -96,17 +77,7 @@
           <div
             class="w-12 h-12 rounded-full bg-[#231f33] flex items-center justify-center text-[#a78bfa] mb-4"
           >
-            <!-- alert icon -->
-            <NuxtImg
-              src="/images/vazio.svg"
-              alt="Ícone de vazio"
-              class="w-12 h-12"
-              loading="lazy"
-              format="webp"
-              quality="80"
-              width="48"
-              height="48"
-            />
+            <Vazio class="w-12 h-12" />
           </div>
           <h3 class="text-lg md:text-xl font-semibold text-white mb-3">
             Lançamento no Vazio
@@ -141,5 +112,8 @@
 </template>
 
 <script setup lang="ts">
+import Cemiterio from "~/components/icon/Cemiterio.vue";
+import Marketing from "~/components/icon/Marketing.vue";
+import Vazio from "~/components/icon/Vazio.vue";
 // Componente de apresentação simples, sem props por enquanto.
 </script>

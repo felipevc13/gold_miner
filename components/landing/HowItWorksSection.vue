@@ -38,14 +38,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <NuxtImg
-              src="/images/explorer.svg"
-              alt="Screenshot Explorer"
-              class="w-full h-auto block"
-              loading="lazy"
-              format="webp"
-              quality="80"
-            />
+            <explorer class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -96,14 +89,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <NuxtImg
-              src="/images/painui.svg"
-              alt="Screenshot Dores"
-              class="w-full h-auto block"
-              loading="lazy"
-              format="webp"
-              quality="80"
-            />
+            <painui class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -145,14 +131,7 @@
             class="absolute inset-0 rounded-2xl blur-2xl bg-gradient-to-r from-[#7c3aed22] via-[#8b5cf622] to-[#7c3aed22]"
           ></div>
           <div class="relative rounded-2xl overflow-hidden">
-            <NuxtImg
-              src="/images/product.svg"
-              alt="Screenshot product"
-              class="w-full h-auto block"
-              loading="lazy"
-              format="webp"
-              quality="80"
-            />
+            <product class="w-full h-auto block" />
           </div>
         </div>
         <div class="md:col-span-5 order-2 md:pl-4">
@@ -199,14 +178,7 @@
             <div
               class="mx-auto mb-3 w-10 h-10 text-[#a78bfa] flex items-center justify-center"
             >
-              <NuxtImg
-                src="/images/ia.svg"
-                alt="Ícone de IA"
-                class="w-12 h-12"
-                loading="lazy"
-                format="webp"
-                quality="80"
-              />
+              <Ai class="w-12 h-12" />
             </div>
             <h4 class="text-white text-2xl md:text-3xl font-extrabold mb-2">
               Pare de construir no escuro.
@@ -234,6 +206,10 @@
 <script setup lang="ts">
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
+import explorer from "~/components/images/explorer.vue";
+import painui from "~/components/images/painui.vue";
+import product from "~/components/images/product.vue";
+import Ai from "~/components/icon/Ai.vue";
 
 const isInviteOpen = useState<boolean>("usabilityInviteOpen", () => false);
 
