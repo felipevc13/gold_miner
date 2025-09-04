@@ -6,8 +6,7 @@
       class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
     >
       <div class="flex items-center justify-center mb-6">
-        <Logo class="w-8 h-8" />
-        <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
+        <Logo class="h-14" />
       </div>
 
       <form @submit.prevent="handleLogin">

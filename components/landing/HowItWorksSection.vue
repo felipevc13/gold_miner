@@ -207,13 +207,12 @@
     </div>
   </section>
   <ClientOnly>
-    <Teleport to="body">
-      <UsabilityTestInviteModal
-        v-model:open="isInviteOpen"
-        @accept="onAcceptInvite"
-        @cancel="isInviteOpen = false"
-      />
-    </Teleport>
+    <UsabilityTestInviteModal
+      v-model:open="isInviteOpen"
+      @accept="onAcceptInvite"
+      @cancel="isInviteOpen = false"
+      data-test="usability-modal-how"
+    />
   </ClientOnly>
 </template>
 

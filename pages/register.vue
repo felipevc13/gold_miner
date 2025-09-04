@@ -3,7 +3,7 @@ definePageMeta({ layout: "blank" });
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Logo from "~/components/icon/Logo.vue";
-import Button from '~/components/ui/Button.vue';
+import Button from "~/components/ui/Button.vue";
 
 const supabase = useSupabaseClient();
 const router = useRouter();
@@ -60,8 +60,7 @@ const handleRegister = async () => {
       class="bg-[#17171C] border border-[#47464B] p-8 rounded-lg shadow-md w-full max-w-sm"
     >
       <div class="flex items-center justify-center mb-6">
-        <Logo class="w-8 h-8" />
-        <h2 class="text-xl ml-1 font-light text-white">Gold Miner</h2>
+        <Logo class="h-14" />
       </div>
       <form @submit.prevent="handleRegister" class="space-y-4">
         <div>
@@ -109,12 +108,8 @@ const handleRegister = async () => {
         <div v-if="successMessage" class="mt-4 text-green-500 text-center">
           {{ successMessage }}
         </div>
-        <Button
-          type="submit"
-          :disabled="loading"
-          class="w-full"
-        >
-          {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+        <Button type="submit" :disabled="loading" class="w-full">
+          {{ loading ? "Cadastrando..." : "Cadastrar" }}
         </Button>
       </form>
       <p class="block mt-6 text-sm text-center text-white">

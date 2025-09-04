@@ -34,9 +34,9 @@
             <Button
               data-test="cta-open-modal"
               class="w-full sm:!w-auto justify-center pointer-events-auto"
-              @click="openModal"
-              @keydown.enter="openModal"
-              @keydown.space.prevent="(e: KeyboardEvent) => openModal(e)"
+              @click.stop="openModal"
+              @keydown.enter.prevent="openModal"
+              @keydown.space.prevent="openModal"
               role="button"
               tabindex="0"
               aria-haspopup="dialog"
@@ -62,12 +62,14 @@
       </div>
     </div>
   </section>
-
-  <UsabilityTestInviteModal
-    v-model:open="isInviteOpen"
-    @accept="onAcceptInvite"
-    @cancel="isInviteOpen = false"
-  />
+  <ClientOnly>
+    <UsabilityTestInviteModal
+      v-model:open="isInviteOpen"
+      @accept="onAcceptInvite"
+      @cancel="isInviteOpen = false"
+      data-test="usability-modal"
+    />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
