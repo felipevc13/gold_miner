@@ -204,6 +204,7 @@
 </template>
 
 <script setup lang="ts">
+// ref and onMounted are auto-imported by Nuxt 3
 import Button from "../ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
 import explorer from "~/components/images/explorer.vue";
@@ -211,13 +212,20 @@ import painui from "~/components/images/painui.vue";
 import product from "~/components/images/product.vue";
 import Ai from "~/components/icon/Ai.vue";
 
-const isInviteOpen = useState<boolean>("usabilityInviteOpen", () => false);
+// Use ref for client-side state
+const isInviteOpen = ref(false);
 
 function openInvite() {
   isInviteOpen.value = true;
 }
+
 function onAcceptInvite() {
   // TODO: personalize – ex.: redirect para /onboarding ou enviar analytics
   isInviteOpen.value = false;
 }
+
+// Ensure proper hydration on client
+onMounted(() => {
+  // Any client-side initialization if needed
+});
 </script>

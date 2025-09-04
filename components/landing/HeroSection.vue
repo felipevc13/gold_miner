@@ -61,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+// ref and onMounted are auto-imported by Nuxt 3
 import Button from "~/components/ui/Button.vue";
 import UsabilityTestInviteModal from "~/components/modals/UsabilityTestInviteModal.vue";
 import ui from "~/components/images/ui.vue";
@@ -72,7 +73,8 @@ defineProps<{
   ctaText?: string;
 }>();
 
-const isInviteOpen = useState<boolean>("usabilityInviteOpen", () => false);
+// Use ref for client-side state
+const isInviteOpen = ref(false);
 
 function openModal() {
   isInviteOpen.value = true;
@@ -82,4 +84,9 @@ function onAcceptInvite() {
   // custom logic, e.g., redirect or analytics
   isInviteOpen.value = false;
 }
+
+// Ensure proper hydration on client
+onMounted(() => {
+  // Any client-side initialization if needed
+});
 </script>
