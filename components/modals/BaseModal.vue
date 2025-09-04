@@ -210,7 +210,9 @@ function handleBackdropClick() {
   if (props.closeOnBackdropClick) closeModal();
 }
 function handleEscKey(event: KeyboardEvent) {
-  if (props.isOpen && props.closeOnEsc && event.key === "Escape") closeModal();
+  if (visible.value && props.closeOnEsc && event.key === "Escape") {
+    closeModal();
+  }
 }
 
 // Use Nuxt's auto-imported lifecycle hooks

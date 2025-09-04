@@ -63,15 +63,11 @@
     </div>
   </section>
 
-  <ClientOnly>
-    <Teleport to="body">
-      <UsabilityTestInviteModal
-        v-model:open="isInviteOpen"
-        @accept="onAcceptInvite"
-        @cancel="isInviteOpen = false"
-      />
-    </Teleport>
-  </ClientOnly>
+  <UsabilityTestInviteModal
+    v-model:open="isInviteOpen"
+    @accept="onAcceptInvite"
+    @cancel="isInviteOpen = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -94,20 +90,20 @@ const isMounted = ref(false);
 // Only render modal after mount
 onMounted(() => {
   isMounted.value = true;
-  
+
   // Debug helper
   if (process.client) {
     (window as any).__heroOpenModal = () => {
       isInviteOpen.value = true;
-      return 'Modal opened';
+      return "Modal opened";
     };
-    console.log('HeroSection mounted, modal can be opened');
+    console.log("HeroSection mounted, modal can be opened");
   }
 });
 
 function openModal() {
   if (process.client) {
-    console.log('Opening modal, isMounted:', isMounted.value);
+    console.log("Opening modal, isMounted:", isMounted.value);
     isInviteOpen.value = true;
   }
 }
@@ -115,7 +111,7 @@ function openModal() {
 function onAcceptInvite() {
   if (process.client) {
     // Open Useberry test in a new tab
-    window.open('https://app.useberry.com/t/8p6kNDLt1N86VD/', '_blank');
+    window.open("https://app.useberry.com/t/8p6kNDLt1N86VD/", "_blank");
     isInviteOpen.value = false;
   }
 }

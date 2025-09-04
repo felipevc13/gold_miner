@@ -191,9 +191,9 @@
             <Button
               data-test="cta-open-modal-how"
               class="pointer-events-auto"
-              @click="openInvite"
-              @keydown.enter="openInvite"
-              @keydown.space.prevent="(e: KeyboardEvent) => openInvite(e)"
+              @click.stop="openInvite"
+              @keydown.enter.prevent="openInvite"
+              @keydown.space.prevent="openInvite"
               role="button"
               tabindex="0"
               aria-haspopup="dialog"
@@ -233,14 +233,14 @@ const isMounted = ref(false);
 // Only render modal after mount
 onMounted(() => {
   isMounted.value = true;
-  
+
   // Debug helper
   if (process.client) {
     (window as any).__howItWorksOpenModal = () => {
       isInviteOpen.value = true;
-      return 'Modal opened';
+      return "Modal opened";
     };
-    console.log('HowItWorksSection mounted, modal can be opened');
+    console.log("HowItWorksSection mounted, modal can be opened");
   }
 });
 
@@ -248,7 +248,7 @@ function openInvite(event: Event) {
   if (process.client) {
     event?.preventDefault();
     event?.stopPropagation();
-    console.log('Opening modal, isMounted:', isMounted.value);
+    console.log("Opening modal, isMounted:", isMounted.value);
     isInviteOpen.value = true;
   }
 }

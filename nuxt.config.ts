@@ -97,7 +97,18 @@ export default defineNuxtConfig({
           rel: "canonical",
           href: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
         },
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico?v=2" },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "32x32",
+          href: "/favicon-32x32.png",
+        },
+        {
+          rel: "apple-touch-icon",
+          sizes: "180x180",
+          href: "/apple-touch-icon.png",
+        },
       ],
     },
   },
@@ -106,6 +117,17 @@ export default defineNuxtConfig({
   nitro: {
     static: false,
     compatibilityDate: "2025-09-04",
+    routeRules: {
+      "/favicon.ico": {
+        headers: { "Cache-Control": "public, max-age=0, must-revalidate" },
+      },
+      "/favicon-32x32.png": {
+        headers: { "Cache-Control": "public, max-age=0, must-revalidate" },
+      },
+      "/apple-touch-icon.png": {
+        headers: { "Cache-Control": "public, max-age=0, must-revalidate" },
+      },
+    },
   },
 
   // Vue configuration
