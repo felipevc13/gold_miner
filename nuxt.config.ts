@@ -104,7 +104,7 @@ export default defineNuxtConfig({
 
   // Static assets configuration
   nitro: {
-    static: true,
+    static: false,
     compatibilityDate: "2025-09-04",
   },
 
