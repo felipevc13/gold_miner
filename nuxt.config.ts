@@ -76,7 +76,7 @@ export default defineNuxtConfig({
           property: "og:url",
           content: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
         },
-        { property: "og:image", content: "/og.jpg" },
+        { property: "og:image", content: "/og.png" },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
         // Twitter
@@ -90,7 +90,7 @@ export default defineNuxtConfig({
           content:
             "Encontre nichos de mercado com um Score de Oportunidade claro. Analise métricas, dores e ideias para validar sua próxima grande aposta.",
         },
-        { name: "twitter:image", content: "/og.jpg" },
+        { name: "twitter:image", content: "/og.png" },
       ],
       link: [
         {
