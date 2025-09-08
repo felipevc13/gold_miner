@@ -4,7 +4,7 @@ import { useSupabaseClient } from "#imports";
 
 export default defineNuxtRouteMiddleware(async (to, _from) => {
   // Páginas que não exigem login
-  const publicPages = ["/", "/login", "/register"];
+  const publicPages = ["/", "/login", "/register", "/pesquisa"];
 
   if (publicPages.includes(to.path)) {
     return; // Permite o acesso a páginas públicas
