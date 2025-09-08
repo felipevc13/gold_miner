@@ -145,6 +145,16 @@ export default defineNuxtConfig({
   build: {
     transpile: [],
   },
+  
+  // PostCSS configuration
+  postcss: {
+    plugins: {
+      'postcss-import': {},
+      'tailwindcss/nesting': 'postcss-nesting',
+      'tailwindcss': {},
+      'autoprefixer': {},
+    },
+  },
 
   // Vite configuration
   vite: {
@@ -206,11 +216,13 @@ export default defineNuxtConfig({
   },
 
   // Global CSS
-  css: ["~/assets/css/tailwind.css", "~/assets/css/global.css"],
+  css: ["~/assets/css/global.css"],
 
   // Modules
   modules: [
+    // Tailwind CSS deve vir primeiro
     "@nuxtjs/tailwindcss",
+    // Outros módulos
     [
       "@pinia/nuxt",
       {
@@ -220,7 +232,7 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@vueuse/nuxt",
     "@nuxtjs/google-fonts",
-    "@nuxt/image",
+    "@nuxt/image"
   ],
 
   // Image module configuration
@@ -257,11 +269,16 @@ export default defineNuxtConfig({
 
   // Tailwind CSS configuration
   tailwindcss: {
-    cssPath: "~/assets/css/tailwind.css",
-    configPath: "tailwind.config",
+    cssPath: '~/assets/css/tailwind.css',
+    configPath: 'tailwind.config',
     exposeConfig: false,
     injectPosition: 0,
-    viewer: true,
+    viewer: false,
+    config: {},
+    experimental: {
+      // Disable Tailwind CSS v4 warning
+      tailwindcss4: false
+    }
   },
 
   // Supabase module configuration
