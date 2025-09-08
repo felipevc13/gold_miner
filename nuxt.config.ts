@@ -269,16 +269,11 @@ export default defineNuxtConfig({
 
   // Tailwind CSS configuration
   tailwindcss: {
-    cssPath: '~/assets/css/tailwind.css',
+    cssPath: ['~/assets/css/tailwind.css', { injectPosition: 0 }],
     configPath: 'tailwind.config',
     exposeConfig: false,
-    injectPosition: 0,
     viewer: false,
-    config: {},
-    experimental: {
-      // Disable Tailwind CSS v4 warning
-      tailwindcss4: false
-    }
+    config: {}
   },
 
   // Supabase module configuration
