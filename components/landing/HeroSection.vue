@@ -13,10 +13,7 @@
           <!-- Headline -->
           <h1
             class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white text-center leading-tight md:leading-[80px] max-w-[950px]"
-            v-html="
-              headline ||
-              'A programação é a parte<br><span class=\'text-[#8E6CE4]\'>mais fácil</span>.<br>O problema é <span class=\'text-[#8E6CE4]\'>vender</span>.'
-            "
+            v-html="headline || `Nós amamos <span class=\'text-[#8E6CE4]\'>construir</span>. O desafio é <span class=\'text-[#8E6CE4]\'>encontrar</span> quem precisa.`"
           ></h1>
 
           <!-- Subheadline -->
