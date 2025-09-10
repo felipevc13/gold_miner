@@ -1,6 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-/* Ensure Roboto is applied to all elements */
+/* Reset e estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Garante que elementos não ultrapassem a largura da tela */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Estilos base do body */
 body {
   font-family: 'Roboto', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Garante que imagens e mídias sejam responsivas */
+img, video, iframe, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Remove estilos padrão de links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Normalização de listas */
+ul, ol {
+  list-style: none;
+}
+
+/* Normalização de botões e inputs */
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+}
+
+/* Evita que elementos flutuantes causem problemas */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
 }

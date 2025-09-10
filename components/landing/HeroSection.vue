@@ -13,7 +13,10 @@
           <!-- Headline -->
           <h1
             class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white text-center leading-tight md:leading-[80px] max-w-[950px]"
-            v-html="headline || `Nós amamos <span class=\'text-[#8E6CE4]\'>construir</span>. O desafio é <span class=\'text-[#8E6CE4]\'>encontrar</span> quem precisa.`"
+            v-html="
+              headline ||
+              `Nós amamos <span class=\'text-[#8E6CE4]\'>construir</span>. O desafio é <span class=\'text-[#8E6CE4]\'>encontrar</span> quem precisa.`
+            "
           ></h1>
 
           <!-- Subheadline -->
@@ -30,7 +33,7 @@
           <div class="w-full max-w-[520px] mx-auto sm:w-auto sm:self-center">
             <Button
               data-test="cta-open-modal"
-              class="w-full sm:!w-auto justify-center pointer-events-auto"
+              class="w-full sm:!w-auto justify-center pointer-events-auto whitespace-normal text-center"
               @click.stop="openModal"
               @keydown.enter.prevent="openModal"
               @keydown.space.prevent="openModal"

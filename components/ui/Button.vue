@@ -1,7 +1,7 @@
 <template>
   <button
     v-if="!to"
-    class="inline-flex items-center justify-center whitespace-nowrap px-5 py-3 w-auto min-h-[40px] rounded-sm font-sans font-semibold text-sm md:text-base leading-none tracking-[-0.12px] hover:opacity-90 transition-opacity"
+    class="inline-flex items-center justify-center whitespace-normal px-5 py-3 w-auto min-h-[40px] rounded-sm font-sans font-semibold text-sm md:text-base leading-normal tracking-[-0.12px] hover:opacity-90 transition-opacity text-center"
     :class="[
       fullWidth ? 'w-full' : '',
       variant === 'secondary'
@@ -17,7 +17,7 @@
   <NuxtLink
     v-else
     :to="to"
-    class="inline-flex items-center justify-center whitespace-nowrap px-5 py-3 w-auto min-h-[40px] rounded-sm font-sans font-semibold text-sm md:text-base leading-none tracking-[-0.12px] hover:opacity-90 transition-opacity"
+    class="inline-flex items-center justify-center whitespace-normal px-5 py-3 w-auto min-h-[40px] rounded-sm font-sans font-semibold text-sm md:text-base leading-normal tracking-[-0.12px] hover:opacity-90 transition-opacity text-center"
     :class="[
       fullWidth ? 'w-full' : '',
       variant === 'secondary'
